@@ -2,3 +2,4 @@
 /data
 /data-tagged
 /resources
+**/__pycache__
