@@ -30,9 +30,9 @@ def train_nb_classifier(train_mat, train_c):
 
 
 def test_nb_classifier(test_vec, prob_neg_vec, prob_pos_vec, prob_class):
-    prob_neg = sum(test_vec*prob_neg_vec) + math.log(1.0-prob_class)
-    prob_pos = sum(test_vec*prob_pos_vec) + math.log(prob_class)
-    if prob_neg.any() > prob_pos.any():
+    prob_neg = sum(test_vec*prob_neg_vec) + np.log(1.0-prob_class)
+    prob_pos = sum(test_vec*prob_pos_vec) + np.log(prob_class)
+    if prob_neg > prob_pos:
         return 0
     else:
         return 1

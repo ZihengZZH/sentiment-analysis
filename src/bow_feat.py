@@ -27,12 +27,20 @@ def bag_words2vec_unigram(corpus, input_texts):
     # return para: dict or copus with presence
     vec2mat = []
     for text in input_texts:
-        vec_unigram = [0]*len(corpus)  # vector for each review
-        for word in text:
-            if word in corpus:
-                vec_unigram[corpus.index(word)] += 1  # presence
-        vec2mat.append(vec_unigram)
+        vec2mat.append(words2vec_unigram(corpus, text))
     return np.array(vec2mat)
+
+
+# return the feature vector
+def words2vec_unigram(corpus, input_text):
+    # para input_texts: data & tags read from the text file
+    # para input_texts: list(list(tuple(str,str)))
+    #   q# return para: dict or copus with presence
+    vec_unigram = [0]*len(corpus)  # vector for each review
+    for word in input_text:
+        if word in corpus:
+            vec_unigram[corpus.index(word)] += 1  # presence
+    return vec_unigram
 
 
 def set_words2vec_bigram(texts):
