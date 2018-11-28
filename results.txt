@@ -1,0 +1,2 @@
+
+feature: unigrams	training size: 100	smooth: no	neg_accuracy: 0.500000	pos_accuracy: 0.500000

@@ -9,44 +9,56 @@ def get_class_vec(sentiment, length):
         return np.ones(length)
 
 
-# return the corpus for all moive reviews
-def corpus_list(input_texts):
+# return the vocabulary for all moive reviews
+def get_vocab(input_texts):
     # para input_texts: list(list(tuple(str,str)))
-    corpus = set()
+    vocab = set()
     for texts in input_texts:
         for text in texts:
-            corpus.add(text)  # union of two sets
-    return list(corpus)
+            vocab.add(text)  # union of two sets
+    return list(vocab)
 
 
 # return the matrix in which each row is the feature vector
-# note that presences are applied
-def bag_words2vec_unigram(corpus, input_texts):
+def bag_words2vec_unigram(vocab, input_texts, freq):
     # para input_texts: data & tags read from the text file
     # para input_texts: list(list(tuple(str,str)))
-    # return para: dict or copus with presence
+    # return para: dict or copus with freq or pres
     vec2mat = []
     for text in input_texts:
-        vec2mat.append(words2vec_unigram(corpus, text))
+        vec2mat.append(words2vec_unigram(vocab, text, freq))
     return np.array(vec2mat)
 
 
 # return the feature vector
-def words2vec_unigram(corpus, input_text):
+def words2vec_unigram(vocab, input_text, freq):
     # para input_texts: data & tags read from the text file
     # para input_texts: list(list(tuple(str,str)))
-    #   q# return para: dict or copus with presence
-    vec_unigram = [0]*len(corpus)  # vector for each review
+    # return para: dict or copus with freq or pres
+    vec_unigram = [0]*len(vocab)  # vector for each review
     for word in input_text:
-        if word in corpus:
-            vec_unigram[corpus.index(word)] += 1  # presence
+        if word in vocab:
+            if freq:
+                vec_unigram[vocab.index(word)] += 1  # frequency
+            else:
+                vec_unigram[vocab.index(word)] = 1   # presence
     return vec_unigram
 
 
-def set_words2vec_bigram(texts):
+def bag_words2vec_bigram(vocab, input_texts, freq):
     # para texts: data & tags read from the text file
     # return para: list of dict
-    return 0
+    # return para: dict or copus with freq or pres
+    vec2mat = []
+    #for text in input_texts:
+
+
+
+def words2vec_bigram(vocab, input_text, freq):
+    # para input_texts: data & tags read from the text file
+    # para input_texts: list(list(tuple(str,str)))
+    # return para: dict or copus with freq or pres
+    vec = [0]
 
 
 def visual_unigram(corpus, vec2mat):
