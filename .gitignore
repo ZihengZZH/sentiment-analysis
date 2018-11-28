@@ -3,3 +3,4 @@
 /data-tagged
 /resources
 **/__pycache__
+*.csv

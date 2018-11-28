@@ -18,10 +18,10 @@ class NBTest(unittest.TestCase):
         pass
 
     def test_nb_classifier(self):
-        nb.nb_classifier('laplace', True, True) # laplace + freq
-        nb.nb_classifier('laplace', False, True) # laplace + pres
-        nb.nb_classifier('None', True, True) # no smoothing + freq
-        nb.nb_classifier('None', False, True) # no smoothing + pres
+        # nb.nb_classifier('laplace', True) # laplace
+        # nb.nb_classifier('laplace', True) # laplace
+        nb.nb_classifier('unigram', 'laplace') # no smoothing
+        # nb.nb_classifier('None', True) # no smoothing
 
 if __name__ == "__main__":
     unittest.main()
