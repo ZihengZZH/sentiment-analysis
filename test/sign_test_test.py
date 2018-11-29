@@ -1,14 +1,14 @@
 import unittest
 import random
-import src.nb_classify as nb
+import src.sign_test as sign
 
 '''
 unittest: The Python unit testing framework
 unittest supports test automation, sharing of setup and shutdown code for tests, aggregation of tests into collections, and independence of the tests from the reporting framework.
-to run the unittest, python -m unittest test.nb_classify_test
+to run the unittest, python -m unittest test.sign_test_test
 '''
 
-class NBTest(unittest.TestCase):
+class SignTestTest(unittest.TestCase):
     # method called to prepare the test fixture
     def setUp(self):
         pass
@@ -17,11 +17,10 @@ class NBTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_nb_classifier(self):
-        # nb.nb_classifier('laplace', True) # laplace
-        # nb.nb_classifier('laplace', True) # laplace
-        nb.nb_classifier('both', 'None', test=True) # no smoothing
-        # nb.nb_classifier_both('laplace', test=True) # laplace smoothing
+    def test_get_p_value(self):
+        # assert sign.get_p_value(50, 50, 100) < 0.0001
+        assert sign.get_p_value(3, 11, 0) == .029
+        
 
 if __name__ == "__main__":
     unittest.main()

@@ -5,6 +5,12 @@ from . import text
 from . import bow_feat as feat
 
 
+# def n_fold_cons(no_fold, neg_reviews, pos_reviews):
+
+
+# def n_fold_RR(no_fold):
+
+
 # train/test partition / cross-validation
 def partition(neg_reviews, pos_reviews, test=False):
     # return para: train size of each class
@@ -21,21 +27,19 @@ def partition(neg_reviews, pos_reviews, test=False):
         pos_reviews_train, pos_reviews_test = pos_reviews[:
                                                           train_size], pos_reviews[train_size:]
     # Note the order: neg, pos
-    reviews_train = neg_reviews_train + pos_reviews_train
-    reviews_test = [neg_reviews_test, pos_reviews_test]
+    reviews_train = neg_reviews_train + pos_reviews_train  # dimension: 1
+    reviews_test = neg_reviews_test + pos_reviews_test  # dimension: 1
     return train_size, test_size, reviews_train, reviews_test
 
 
-def train_nb_classifier(train_mat, train_c, smooth_type, feat_type):
+def train_nb_classifier(train_mat, train_c, smooth_type):
     # para train_mat: matrix of data & tags
     # para train_c: R^2 sentiment (neg/0 or pos/1)
     # return para: prob_vec: R^2 vec of conditional prob
     # return para: prior_sentiment
     if (smooth_type != 'laplace') and (smooth_type != 'None'):
         return
-    if (feat_type != 'unigram') and (feat_type != 'bigram'):
-        return 
-    
+
     no_train_review = len(train_mat)
     no_words = len(train_mat[0])
     prior_sentiment = sum(train_c) / float(no_train_review)  # prob 0.5
@@ -72,9 +76,28 @@ def test_nb_classifier(test_vec, prob_neg_vec, prob_pos_vec, prior_class):
     # para prob_neg_vec: P(fi|0)
     # para prob_pos_vec: P(fi|1)
     # para prob_class: P(c=0) or P(c=1) (equal in this project)
-    # conditional prob of features already log
     prob_neg = sum(test_vec*np.log(prob_neg_vec)) + np.log(1.0-prior_class)
     prob_pos = sum(test_vec*np.log(prob_pos_vec)) + np.log(prior_class)
+    # binary classification argmax
+    if prob_neg > prob_pos:
+        # predict a negative review
+        return 0
+    else:
+        # predict a positive review
+        return 1
+
+
+def test_nb_classifier_both(test_vec, prob_neg_vec, prob_pos_vec, prior_class):
+    # para test_vec: two vecs (unigram + bigram)
+    # para prob_neg_vec: two vecs on two sets of features P(fi|0)
+    # para prob_pos_vec: two vecs on two sets of features P(fi|1)
+    # para prob_class: P(c=0) or P(c=1) (equal in this project)
+    prob_neg, prob_pos = 0.0, 0.0
+    for i in range(len(test_vec)):
+        prob_neg = sum(test_vec[i]*np.log(prob_neg_vec[i])
+                       ) + np.log(1.0-prior_class)
+        prob_pos = sum(test_vec[i]*np.log(prob_pos_vec[i])
+                       ) + np.log(prior_class)
     # binary classification argmax
     if prob_neg > prob_pos:
         # predict a negative review
@@ -99,14 +122,28 @@ def nb_classifier(feat_type, smoothing, test=False):
 
     print("\nfinding the vocabulary for the classifier ...")
     # full vocabulary for the training reviews (frequency cutoff implemented)
-    full_vocab = feat.get_vocab(
-        reviews_train, cutoff_threshold=9) if feat_type == 'unigram' else feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+    if feat_type == 'unigram':
+        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9)
+    elif feat_type == 'bigram':
+        full_vocab = feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+    else:
+        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9) + \
+            feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
     print("\n#features is ", len(full_vocab))
 
     print("\ngenerating the training matrix ...")
     # training matrix of data and tags
-    train_matrix = feat.bag_words2vec_unigram(
-        full_vocab, reviews_train) if feat_type == 'unigram' else feat.bag_words2vec_bigram(full_vocab, reviews_train)
+    if feat_type == 'unigram':
+        train_matrix = feat.bag_words2vec_unigram(full_vocab, reviews_train)
+    elif feat_type == 'bigram':
+        train_matrix = feat.bag_words2vec_bigram(full_vocab, reviews_train)
+    else:
+        train_matrix = list()
+        train_matrix_uni = feat.bag_words2vec_unigram(
+            full_vocab, reviews_train)
+        train_matrix_bi = feat.bag_words2vec_bigram(full_vocab, reviews_train)
+        for i in range(len(train_matrix_uni)):
+            train_matrix.append(train_matrix_uni[i] + train_matrix_bi[i])
     if test:
         print('\ndescription of training matrix', stats.describe(train_matrix))
 
@@ -117,31 +154,32 @@ def nb_classifier(feat_type, smoothing, test=False):
     print("\ntraining the Naive Bayes classifier ...")
     # train the Naive Bayes classifier
     prob_neg_vec, prob_pos_vec, prob_sentiment = train_nb_classifier(
-        train_matrix, train_class_vector, smoothing, feat_type)
+        train_matrix, train_class_vector, smoothing)
     print("prob vector on neg reviews", prob_neg_vec, "\nprob vector on pos reviews",
           prob_pos_vec, "\nprob of sentiment", prob_sentiment)
 
     print("\ntesting the Naive Bayes classifier ...")
     # test the classifier with another review
     i, neg_score, pos_score = 0, 0, 0
-    for review_test in reviews_test[0]:
-        test_vec = feat.words2vec_unigram(
-            full_vocab, review_test) if feat_type == 'unigram' else feat.words2vec_bigram(full_vocab, review_test)
+    for i in range(len(reviews_test)):
+        if feat_type == 'unigram':
+            test_vec = feat.words2vec_unigram(full_vocab, reviews_test[i])
+        elif feat_type == 'bigram':
+            test_vec = feat.words2vec_bigram(full_vocab, reviews_test[i])
+        else:
+            test_vec = np.array(feat.words2vec_unigram(
+                full_vocab, reviews_test[i])) + np.array(feat.words2vec_bigram(full_vocab, reviews_test[i]))
+
         test_result = test_nb_classifier(
             test_vec, prob_neg_vec, prob_pos_vec, prob_sentiment)
-        neg_score += test_result
-        i += 1
-        print("Test sample %d \nThis review is %d review, 0 for neg" %
-              (i, test_result))
-    for review_test in reviews_test[1]:
-        test_vec = feat.words2vec_unigram(
-            full_vocab, review_test) if feat_type == 'unigram' else feat.words2vec_bigram(full_vocab, review_test)
-        test_result = test_nb_classifier(
-            test_vec, prob_neg_vec, prob_pos_vec, prob_sentiment)
-        pos_score += test_result
-        print("Test sample %d \nThis review is %d review, 1 for pos" %
-              (i, test_result))
-        i += 1
+        if i < test_size:
+            neg_score += test_result
+            print("Test sample %d \nThis review is %d review, 0 for neg" %
+                  (i, test_result))
+        else:
+            pos_score += test_result
+            print("Test sample %d \nThis review is %d review, 1 for pos" %
+                  (i, test_result))
 
     # print overall accuracy
     print("overall accuracy for negative reviews", 1-(neg_score/test_size))

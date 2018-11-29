@@ -12,3 +12,11 @@ feature: unigrams	training size: 200	smooth: laplace	neg_accuracy: 0.840000	pos_
 feature: unigrams	training size: 200	smooth: laplace	neg_accuracy: 0.700000	pos_accuracy: 0.680000
 feature: bigram	training size: 900	smooth: laplace	neg_accuracy: 0.830000	pos_accuracy: 0.820000
 feature: unigram	training size: 900	smooth: laplace	neg_accuracy: 0.890000	pos_accuracy: 0.720000
+feature: both	training size: 200	smooth: laplace	neg_accuracy: 0.700000	pos_accuracy: 0.680000
+feature: both	training size: 200	smooth: laplace	neg_accuracy: 0.000000	pos_accuracy: 1.000000
+feature: both	training size: 200	smooth: laplace	neg_accuracy: 0.700000	pos_accuracy: 0.680000
+feature: unigram	training size: 900	smooth: laplace	neg_accuracy: 0.000000	pos_accuracy: 1.000000
+feature: unigram	training size: 200	smooth: laplace	neg_accuracy: 0.840000	pos_accuracy: 0.660000
+feature: bigram	training size: 200	smooth: laplace	neg_accuracy: 0.700000	pos_accuracy: 0.680000
+feature: bigram	training size: 200	smooth: laplace	neg_accuracy: 0.700000	pos_accuracy: 0.680000
+feature: both	training size: 200	smooth: laplace	neg_accuracy: 0.000000	pos_accuracy: 1.000000
