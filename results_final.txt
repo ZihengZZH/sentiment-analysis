@@ -1,0 +1,8 @@
+feature: unigram	#feature: 9789	training size: 900	smooth: laplace	neg_accuracy: 0.890000	pos_accuracy: 0.720000
+feature: bigram	#feature: 9742	training size: 900	smooth: laplace	neg_accuracy: 0.830000	pos_accuracy: 0.820000
+feature: unigram	#feature: 9789	training size: 900	smooth: None	neg_accuracy: 0.850000	pos_accuracy: 0.750000
+feature: bigram	#feature: 9742	training size: 900	smooth: None	neg_accuracy: 0.800000	pos_accuracy: 0.800000
+
+
+Sign test:	 Plus: 13, Minus: 14, Null: 173
+the p-value for this sign test between two classifier using unigram features: 1.000000

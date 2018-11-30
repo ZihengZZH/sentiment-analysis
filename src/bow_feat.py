@@ -128,7 +128,7 @@ def visual_matrix_bigram(vocab, vec2mat):
 
 
 def concatenate_feat(vec2mat_uni, vec2mat_bi):
-    vec2mat = []
+    vec2mat = list()
     for i in range(len(vec2mat_bi)):
-        vec2mat[i] = vec2mat_uni + vec2mat_bi
+        vec2mat.append(vec2mat_uni[i] + vec2mat_bi[i])
     return vec2mat
