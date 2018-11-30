@@ -4,5 +4,12 @@ feature: unigram	#feature: 9789	training size: 900	smooth: None	neg_accuracy: 0.
 feature: bigram	#feature: 9742	training size: 900	smooth: None	neg_accuracy: 0.800000	pos_accuracy: 0.800000
 
 
-Sign test:	 Plus: 13, Minus: 14, Null: 173
-the p-value for this sign test between two classifier using unigram features: 1.000000
+fold type: consecutive	feature: unigram	performances: [0.81  0.84  0.845]	average performance: 0.831667	variance: 0.000239
+fold type: consecutive	feature: bigram	performances: [0.795 0.855 0.825]	average performance: 0.825000	variance: 0.000600
+fold type: consecutive	feature: unigram	performances: [0.81  0.84  0.845 0.83  0.795 0.8   0.8   0.81  0.84  0.805]	average performance: 0.817500	variance: 0.000331
+fold type: consecutive	feature: bigram	performances: [0.795 0.855 0.825 0.82  0.745 0.795 0.78  0.825 0.83  0.825]	average performance: 0.809500	variance: 0.000877
+
+Sign test:  Plus: 7, Minus: 12, Null: 181
+the p-value for this sign test between two classifier using both features 0.777921
+Sign test:	 Plus: 2, Minus: 7, Null: 191
+the p-value for this sign test between two classifier using bigram features: 0.777921

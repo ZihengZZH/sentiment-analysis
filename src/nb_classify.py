@@ -80,13 +80,13 @@ def prepare_data_roundrobin(neg_reviews, pos_reviews, test_range):
     train_size, test_size = 900, 100
     neg_reviews_train, neg_reviews_test, pos_reviews_train, pos_reviews_test = [], [], [], []
     for ele in test_range:
-        neg_reviews_train += neg_reviews[ele]
-        pos_reviews_train += pos_reviews[ele]
+        neg_reviews_test += neg_reviews[ele]
+        pos_reviews_test += pos_reviews[ele]
         
     train_range = list(set(range(1000)) - set(test_range))
     for ele in train_range:
-        neg_reviews_test += neg_reviews[ele]
-        pos_reviews_test += pos_reviews[ele]
+        neg_reviews_train += neg_reviews[ele]
+        pos_reviews_train += pos_reviews[ele]
     # Note the order: neg, pos
     reviews_train = neg_reviews_train + pos_reviews_train  # dimension: 1
     reviews_test = neg_reviews_test + pos_reviews_test  # dimension: 1
@@ -268,7 +268,7 @@ def ten_fold_crossvalidation(fold_type, feat_type, test=False):
         test_ranges = n_fold_RR(no_fold, length_data)
 
     results = list()
-    for i in range(len(test_ranges)-7):
+    for i in range(len(test_ranges)):
         if fold_type == 'consecutive':
             train_size, test_size, reviews_train, reviews_test = prepare_data_tenfold(neg_reviews, pos_reviews, test_ranges[i])
         else:
