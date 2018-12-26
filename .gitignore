@@ -4,3 +4,6 @@
 /resources
 **/__pycache__
 *.csv
+*.txt
+!todo.txt
+/.vscode

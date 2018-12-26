@@ -46,8 +46,8 @@ def part_4():
 
 if __name__ == "__main__":
     # part_1()
-    part_2()
+    # part_2()
     # part_3()
     # part_4()
-
+    nb.ten_fold_crossvalidation('RR', 'unigram') 
     

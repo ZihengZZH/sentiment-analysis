@@ -283,7 +283,7 @@ def ten_fold_crossvalidation(fold_type, feat_type, test=False):
     f = open('./results_final.txt', 'a+', encoding='utf-8')
     f.write("\nfold type: %s\tfeature: %s\tperformances: %s\taverage performance: %f\tvariance: %f" % (fold_type, feat_type, performances, perf_average, variance))
     f.close()
-    print("\written to files ...")
+    print("\nwritten to files ...")
 
     
     
