@@ -1,5 +1,9 @@
 import numpy as np
 
+import progressbar
+from multiprocessing import cpu_count, Pool
+from functools import partial
+
 
 # return the vector of labels (neg/0 or pos/1)
 def get_class_vec(sentiment, length):
@@ -15,7 +19,11 @@ def get_vocab(input_texts, cutoff_threshold=0):
     # para cutoff_threshold: predetermined: 10546/63331 (>9)
     # return para: # feature
     freq_dict, vocab = dict(), list()
-    for texts in input_texts:
+
+    bar = progressbar.ProgressBar()
+    
+    for t in bar(range(len(input_texts))):
+        texts = input_texts[t]
         for text in texts:
             if text in freq_dict:
                 freq_dict[text] += 1
@@ -33,7 +41,11 @@ def get_vocab_bigram(input_texts, cutoff_threshold=0):
     # para cutoff_threshold: predetermined: 10918/502596 (>14)
     # return para: # feature list(tuple(tuple(str,str)))
     freq_dict, vocab = dict(), list()
-    for texts in input_texts:
+
+    bar = progressbar.ProgressBar()
+
+    for t in bar(range(len(input_texts))):
+        texts = input_texts[t]
         for i in range(len(texts)-1):
             if (texts[i], texts[i+1]) in freq_dict:
                 freq_dict[(texts[i], texts[i+1])] += 1
@@ -61,7 +73,19 @@ def get_vocab_count(input_texts):
 def bag_words2vec_unigram(vocab, input_texts):
     # para input_texts: data & tags read from the text file
     # para input_texts: list(list(tuple(str,str)))
-    # return para: dict or copus with freq or pres
+    # return para: dict or copus with freq
+    vec2mat = np.zeros((len(input_texts), len(vocab)))
+
+    # bar = progressbar.ProgressBar()
+    NUM_PROCESS = cpu_count() * 3
+    pool = Pool(processes=NUM_PROCESS)
+    
+    vec2mat = np.array(list(pool.map(partial(words2vec_unigram, vocab), input_texts)))
+
+    return vec2mat
+
+
+def bag_words2vec_unigram_naive(vocab, input_texts):
     vec2mat = []
     for text in input_texts:
         vec2mat.append(words2vec_unigram(vocab, text))
@@ -72,7 +96,8 @@ def bag_words2vec_unigram(vocab, input_texts):
 def words2vec_unigram(vocab, input_text):
     # para input_texts: data & tags read from the text file
     # para input_texts: list(list(tuple(str,str)))
-    # return para: dict or copus with freq or pres
+    # return para: dict or copus with freq
+    # return type: list[integer]
     vec_unigram = [0]*len(vocab)  # vector for each review
     for word in input_text:
         if word in vocab:
@@ -85,17 +110,22 @@ def bag_words2vec_bigram(vocab, input_texts):
     # para input_texts: data & tags read from the text file
     # para input_texts: list(list(tuple(str,str)))
     # para texts: data & tags read from the text file
-    # return para: list of dict
     # return para: dict or copus with freq
+    vec2mat = np.zeros((len(input_texts), len(vocab)))
+
+    # bar = progressbar.ProgressBar()
+    NUM_PROCESS = cpu_count() * 3
+    pool = Pool(processes=NUM_PROCESS)
+   
+    vec2mat = np.array(list(pool.map(partial(words2vec_bigram, vocab), input_texts)))
+    
+    return vec2mat
+
+
+def bag_words2vec_bigram_naive(vocab, input_texts):
     vec2mat = []
-    # dict of vocabulary and counts
-    vocab_count = get_vocab_count(input_texts) 
     for text in input_texts:
         vec2mat.append(words2vec_bigram(vocab, text))
-    # for vec in vec2mat:
-    #     for i in range(len(vec)):
-    #         if vec[i] != 0:
-    #             vec[i] = vec[i]/vocab_count[vocab[i][0]]
     return np.array(vec2mat)
 
 
@@ -104,6 +134,7 @@ def words2vec_bigram(vocab, input_text):
     # para input_text: data & tags read from the text file
     # para input_text: list(tuple(str,str))
     # return para: dict or copus with freq
+    # return type: list[integer]
     vec_bigram = [0]*len(vocab)
     for i in range(len(input_text)-1):
         if (input_text[i], input_text[i+1]) in vocab:

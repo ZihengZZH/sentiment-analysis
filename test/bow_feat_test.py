@@ -39,32 +39,37 @@ class BoWFeatureTest(unittest.TestCase):
         # check algorithms on the sample reviews
         sample_vocab = feat.get_vocab(self.sample_text)
         mat_feat = feat.bag_words2vec_unigram(sample_vocab, self.sample_text)
+        mat_feat_naive = feat.bag_words2vec_unigram_naive(sample_vocab, self.sample_text)
         assert len(sample_vocab) == len(mat_feat[random.randrange(0, 2)])
-        # feat.visual_matrix(sample_vocab, mat_feat)
+        assert mat_feat_naive.all() == mat_feat.all()
+
 
     def test_bag_words2vec_unigram_real(self):
         # take only 10 reviews into test part
         texts = text.read_data_tag_from_file('neg')[:10]
         sample_vocab = feat.get_vocab(texts, 9)
         mat_feat = feat.bag_words2vec_unigram(sample_vocab, texts)
+        mat_feat_naive = feat.bag_words2vec_bigram_naive(sample_vocab, texts)
         assert len(sample_vocab) == len(mat_feat[random.randrange(0, 10)])
-        # feat.visual_matrix(sample_vocab, mat_feat)
+        assert mat_feat_naive.all() == mat_feat.all()
 
     def test_bag_words2vec_bigram(self):
         # check algorithms on the sample reviews
         sample_vocab = feat.get_vocab_bigram(self.sample_text)
         mat_feat = feat.bag_words2vec_bigram(sample_vocab, self.sample_text)
+        mat_feat_naive = feat.bag_words2vec_bigram_naive(sample_vocab, self.sample_text)
         assert len(sample_vocab) == len(mat_feat[random.randrange(0, 2)])
-        feat.visual_matrix_bigram(sample_vocab, mat_feat)
+        assert mat_feat_naive.all() == mat_feat.all()
 
     def test_bag_words2vec_bigram_real(self):
         # take only 10 reviews into test part
         texts = text.read_data_tag_from_file('neg')[:10]
         sample_vocab = feat.get_vocab_bigram(texts, 14)
         mat_feat = feat.bag_words2vec_bigram(sample_vocab, texts)
+        mat_feat_naive = feat.bag_words2vec_bigram_naive(sample_vocab, texts)
         assert len(sample_vocab) == len(mat_feat[random.randrange(0, 10)])
-        # feat.visual_matrix_bigram(sample_vocab, mat_feat[0])
+        assert mat_feat_naive.all() == mat_feat.all()
 
-        
+
 if __name__ == "__main__":
     unittest.main()
