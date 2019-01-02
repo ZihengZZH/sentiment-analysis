@@ -125,7 +125,7 @@ def cross_validation_10fold(fold_type, feature_type):
 
 
 if __name__ == "__main__":
-    naive_bayes_classifier("unigram", "laplace")
+    naive_bayes_classifier("unigram", "None")
     
     
 
