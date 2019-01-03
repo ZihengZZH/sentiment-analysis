@@ -48,11 +48,15 @@ def partition(neg_reviews, pos_reviews, test=False):
     return train_size, test_size, reviews_train, reviews_test
 
 
-def prepare_data():
+def prepare_data(pos=False):
     # prepare the data without partition
     # read all neg and pos reviews
-    neg_reviews = text.read_data_tag_from_file('neg')
-    pos_reviews = text.read_data_tag_from_file('pos')
+    if not pos:
+        neg_reviews = text.read_data_from_file('neg')
+        pos_reviews = text.read_data_from_file('pos')
+    else:
+        neg_reviews = text.read_data_tag_from_file('neg')
+        pos_reviews = text.read_data_tag_from_file('pos')
 
     print("\ntrain/test partitioning ...")
 

@@ -2,9 +2,7 @@ import numpy as np
 import math
 from scipy import stats
 import datetime
-from . import text
-from . import bow_feat as feat
-from . import sign_test as st
+from sklearn.naive_bayes import GaussianNB
 
 import progressbar
 from multiprocessing import cpu_count, Pool
@@ -92,14 +90,8 @@ def test_nb_classifier(test_vec):
 
     prob_neg = sum(test_vec*prob_neg_log) + np.log(1.0-prior_class)
     prob_pos = sum(test_vec*prob_pos_log) + np.log(prior_class)
-    # binary classification argmax
-    # if prob_neg > prob_pos:
-    #     # predict a negative review
-    #     return 0
-    # else:
-    #     # predict a positive review
-    #     return 1
     
+    # binary classification argmax
     return np.argmax([prob_neg, prob_pos])
 
 
@@ -119,3 +111,22 @@ def save_results_cv(fold_type, feat_type, performances, perf_average, variance):
     f.write("\nfold type: %s\nfeature: %s\t#performance: %s\taverage performance: %f\tvariance: %f\tnotes: %s" % (
         fold_type, feat_type, performances, perf_average, variance, notes))
     f.close()
+
+
+# sklearn implementation of Naive Bayes classifier
+def sklearn_nb_classifier(train_reviews, train_labels, test_reviews_neg, test_reviews_pos):
+    model = GaussianNB()
+    
+    print("\ntraining the sklearn NB classifier ...")
+    model.fit(train_reviews, train_labels)
+
+    print("\ntesting the sklearn NB classifier ...")
+    predicted_neg = model.predict(test_reviews_neg)
+    predicted_pos = model.predict(test_reviews_pos)
+
+    neg_accuracy = (len(test_reviews_neg) - sum(predicted_neg)) / len(test_reviews_neg)
+    pos_accuracy = sum(predicted_pos) / len(test_reviews_pos)
+
+    print("\naccuracy for negative reviews", neg_accuracy)
+    print("accuracy for positive reviews", pos_accuracy)
+    print("overall accuracy for this classifier", (neg_accuracy+pos_accuracy)/2)

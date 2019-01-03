@@ -9,6 +9,7 @@ from scipy import stats
 import progressbar
 from multiprocessing import cpu_count, Pool
 
+POS_TAGGING = False
 
 def naive_bayes_classifier(feature_type, smoothing, cv_part=False, train_size_cv=None, test_size_cv=None, reviews_train_cv=None, reviews_test_cv=None):
     # para smoothing: the type of smoothing
@@ -32,7 +33,7 @@ def naive_bayes_classifier(feature_type, smoothing, cv_part=False, train_size_cv
     print("\n#features is ", vocab_length)
     
     print("\ngenerating the training matrix ...")
-    # training matrix of data and tags
+    # training matrix of data
     if feature_type == 'unigram':
         train_matrix = feat.bag_words2vec_unigram(full_vocab, reviews_train)
     elif feature_type == 'bigram':
@@ -42,7 +43,7 @@ def naive_bayes_classifier(feature_type, smoothing, cv_part=False, train_size_cv
             full_vocab, reviews_train), feat.bag_words2vec_bigram(full_vocab, reviews_train))
     print('\ndescription of training matrix', stats.describe(train_matrix))
     
-    # training vectors of labels
+    # training vector of labels
     train_class_vector = np.hstack(
         (feat.get_class_vec('neg', train_size), feat.get_class_vec('pos', train_size)))
 

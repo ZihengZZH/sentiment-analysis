@@ -15,7 +15,8 @@ def get_class_vec(sentiment, length):
 
 # return the vocabulary for all movie reviews
 def get_vocab(input_texts, cutoff_threshold=0):
-    # para input_texts: list(list(tuple(str,str)))
+    # para input_texts: list(list(str))
+    # DATA_TAG: list(list(tuple(str,str)))
     # para cutoff_threshold: predetermined: 10546/63331 (>9)
     # return para: # feature
     freq_dict, vocab = dict(), list()
@@ -37,7 +38,8 @@ def get_vocab(input_texts, cutoff_threshold=0):
 
 # return the vocabulart for all movie reviews (pair)
 def get_vocab_bigram(input_texts, cutoff_threshold=0):
-    # para input_texts: list(list(tuple(str,str)))
+    # para input_texts: list(list(str))
+    # DATA_TAG: list(list(tuple(str,str)))
     # para cutoff_threshold: predetermined: 10918/502596 (>14)
     # return para: # feature list(tuple(tuple(str,str)))
     freq_dict, vocab = dict(), list()

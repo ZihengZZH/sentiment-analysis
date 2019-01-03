@@ -1,5 +1,7 @@
 import unittest
+from src.text import read_data_from_file
 from src.text import read_data_tag_from_file
+from src.text import visual_data
 from src.text import visual_data_tag
 
 '''
@@ -18,14 +20,25 @@ class TextReadTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_rea_tag_from_file(self):
+    def test_read_data_from_file(self):
+        reviews_neg = read_data_from_file('neg')
+        reviews_pos = read_data_from_file('pos')
+        assert len(reviews_neg) == self.number_reviews
+        assert len(reviews_pos) == self.number_reviews
+
+    def test_read_data_tag_from_file(self):
         tags_neg = read_data_tag_from_file('neg')
         tags_pos = read_data_tag_from_file('pos')
         assert len(tags_neg) == self.number_reviews
         assert len(tags_pos) == self.number_reviews
 
+    def test_visual_data(self):
+        visual_data(read_data_from_file('neg'))
+        pass
+
     def test_visual_data_tag(self):
         visual_data_tag(read_data_tag_from_file('neg'))
+        pass
 
 
 if __name__ == "__main__":
