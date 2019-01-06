@@ -27,12 +27,12 @@ class BoWFeatureTest(unittest.TestCase):
         pass
 
     def test_freq_cutoff(self):
-        neg_texts = text.read_data_tag_from_file('neg')
-        pos_texts = text.read_data_tag_from_file('pos')
+        neg_texts = text.read_data_from_file('neg')
+        pos_texts = text.read_data_from_file('pos')
         vocab_unigram = feat.get_vocab(neg_texts+pos_texts,9)
         vocab_bigram = feat.get_vocab_bigram(neg_texts+pos_texts,14)
-        # print(len(vocab_unigram))
-        # print(len(vocab_bigram))
+        print(len(vocab_unigram))
+        print(len(vocab_bigram))
     
 
     def test_bag_words2vec_unigram(self):
@@ -46,12 +46,13 @@ class BoWFeatureTest(unittest.TestCase):
 
     def test_bag_words2vec_unigram_real(self):
         # take only 10 reviews into test part
-        texts = text.read_data_tag_from_file('neg')[:10]
+        texts = text.read_data_from_file('neg')[:10]
         sample_vocab = feat.get_vocab(texts, 9)
         mat_feat = feat.bag_words2vec_unigram(sample_vocab, texts)
         mat_feat_naive = feat.bag_words2vec_bigram_naive(sample_vocab, texts)
         assert len(sample_vocab) == len(mat_feat[random.randrange(0, 10)])
         assert mat_feat_naive.all() == mat_feat.all()
+        feat.visual_matrix(sample_vocab, mat_feat)
 
     def test_bag_words2vec_bigram(self):
         # check algorithms on the sample reviews
@@ -63,7 +64,7 @@ class BoWFeatureTest(unittest.TestCase):
 
     def test_bag_words2vec_bigram_real(self):
         # take only 10 reviews into test part
-        texts = text.read_data_tag_from_file('neg')[:10]
+        texts = text.read_data_from_file('neg')[:10]
         sample_vocab = feat.get_vocab_bigram(texts, 14)
         mat_feat = feat.bag_words2vec_bigram(sample_vocab, texts)
         mat_feat_naive = feat.bag_words2vec_bigram_naive(sample_vocab, texts)

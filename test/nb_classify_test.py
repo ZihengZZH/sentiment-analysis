@@ -22,11 +22,6 @@ class NBTest(unittest.TestCase):
     # method called immediately after the test method has been called and the result recorded
     def tearDown(self):
         pass
-
-    def test_save_to_file(self):
-        # a, b, c = np.ones(1000), np.zeros(1000), 0.5
-        # nb.save_to_file(a, b, c)
-        pass
         
     def test_train_nb_classifier(self):
         # print("\ntraining the Naive Bayes classifier w/ unigram & unsmoothing")
@@ -37,9 +32,11 @@ class NBTest(unittest.TestCase):
         # train_class_vector = np.hstack(
         # (feat.get_class_vec('neg', self.train_size), feat.get_class_vec('pos', self.train_size)))
 
+        # # print(train_matrix, train_class_vector)
+
         # print("\ntraining the Naive Bayes classifier ...")
         # # train the Naive Bayes classifier
-        # nb.train_nb_classifier(train_matrix, train_class_vector, "None")
+        # nb.train_nb_classifier(train_matrix, train_class_vector, self.full_vocab, "laplace")
         # print("\nthe training process, DONE. ")
         pass
     
@@ -71,12 +68,13 @@ class NBTest(unittest.TestCase):
         # # print overall accuracy
         # neg_accuracy = (neg_correct/self.test_size)
         # pos_accuracy = (pos_correct/self.test_size)
+        # overall_accuracy = sum(classification_result)/len(classification_result)
         # print("\naccuracy for negative reviews", neg_accuracy)
         # print("accuracy for positive reviews", pos_accuracy)
-        # print("overall accuracy for this classifier", sum(classification_result)/len(classification_result))
+        # print("overall accuracy for this classifier", overall_accuracy)
         
         # # save classification results to files
-        # nb.save_results("unigram", self.vocab_length, self.train_size, "laplace", neg_accuracy, pos_accuracy)
+        # nb.save_results("unigram", self.vocab_length, self.train_size, "laplace", neg_accuracy, pos_accuracy, overall_accuracy)
         # print("\nclassification results written to file")
         pass
 
@@ -99,7 +97,12 @@ class NBTest(unittest.TestCase):
         print(np.array(test_reviews_pos).shape)
 
         nb.sklearn_nb_classifier(train_matrix, train_class_vector, test_reviews_neg, test_reviews_pos)
+        pass
 
+    def test_visual_important_word(self):
+        # nb.visual_important_word('neg')
+        # nb.visual_important_word('pos')
+        pass
 
 if __name__ == "__main__":
     unittest.main()

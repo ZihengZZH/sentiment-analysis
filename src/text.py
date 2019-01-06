@@ -10,6 +10,7 @@ path_data_tag_pos = './data-tagged/POS'
 
 punctuations = string.punctuation+'``'+'"'
 
+
 def read_data_from_file(sentiment):
     # para sentiment: whether the review is neg or pos
     # return para: a list of words along without their tags
@@ -23,7 +24,8 @@ def read_data_from_file(sentiment):
             review = list()
             for line in f:
                 for word in re.split('\W+', line):
-                    review.append(word)
+                    if word != '':
+                            review.append(word)
             reviews.append(review)
             f.close()
     return reviews

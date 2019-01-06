@@ -15,7 +15,7 @@ def naive_bayes_classifier(feature_type, smoothing, cv_part=False, train_size_cv
     # para smoothing: the type of smoothing
     # para test: test case or not
 
-    print("\nNaive Bayes Classifier on sentiment detection running\npreparing data ...")
+    print("\nNaive Bayes Classifier on sentiment detection running\n\npreparing data ...")
     if not cv_part:
         train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
     else:
@@ -84,12 +84,13 @@ def naive_bayes_classifier(feature_type, smoothing, cv_part=False, train_size_cv
     # print overall accuracy
     neg_accuracy = (neg_correct/test_size)
     pos_accuracy = (pos_correct/test_size)
+    overall_accuracy = sum(classification_result)/len(classification_result)
     print("\naccuracy for negative reviews", neg_accuracy)
     print("accuracy for positive reviews", pos_accuracy)
-    print("overall accuracy for this classifier", sum(classification_result)/len(classification_result))
+    print("overall accuracy for this classifier", overall_accuracy)
     
     # save classification results to files
-    nb.save_results(feature_type, vocab_length, train_size, smoothing, neg_accuracy, pos_accuracy)
+    nb.save_results(feature_type, vocab_length, train_size, smoothing, neg_accuracy, pos_accuracy, overall_accuracy)
     print("\nclassification results written to file")
 
     return classification_result
@@ -126,46 +127,5 @@ def cross_validation_10fold(fold_type, feature_type):
 
 
 if __name__ == "__main__":
-    naive_bayes_classifier("unigram", "None")
-    
-    
-
-'''
-# implement Naive Bayes and report results using simple classification accuracy
-def part_1():
-    # nb_classifier(feature_type, smoothing)
-
-    nb.nb_classifier('unigram', 'None') # done
-    nb.nb_classifier('bigram', 'None') # done
-    nb.nb_classifier('both', 'None')
-
-    nb.nb_classifier('unigram', 'laplace') # done
-    nb.nb_classifier('bigram', 'laplace') # done
-    nb.nb_classifier('both', 'laplace')
-
-
-def part_2():
-    # unigram feature
-    # unigram_result_no_smoothing = nb.nb_classifier('unigram', 'None')
-    # unigram_result_smoothing = nb.nb_classifier('unigram', 'laplace')
-    # st.run_sign_test(unigram_result_no_smoothing, unigram_result_smoothing, 'unigram')
-
-    # bigram feature
-    bigram_result_no_smoothing = nb.nb_classifier('bigram', 'None')
-    bigram_result_smoothing = nb.nb_classifier('bigram', 'laplace')
-    st.run_sign_test(bigram_result_no_smoothing, bigram_result_smoothing, 'bigram')
-
-    # both unigram and bigram features
-    # both_result_no_smoothing = nb.nb_classifier('both', 'None')
-    # both_result_smoothing = nb.nb_classifier('both', 'laplace')
-    # st.run_sign_test(both_result_no_smoothing, both_result_smoothing, 'both') # darwin mac
-
-
-def part_3():
-    nb.ten_fold_crossvalidation('consecutive', 'unigram') 
-    nb.ten_fold_crossvalidation('consecutive', 'bigram') # T-580
-
-def part_4():
-    nb.ten_fold_crossvalidation('RR', 'unigram')
-    nb.ten_fold_crossvalidation('RR', 'bigram') # Macbook-pro
-'''
+    naive_bayes_classifier("bigram", "laplace")
+    # cross_validation_10fold('consecutive', 'unigram')

@@ -111,4 +111,5 @@ venv.bak/
 *.txt
 !todo.txt
 /.vscode
-/models
+/nb_models
+/svm_models
