@@ -1,11 +1,15 @@
 import numpy as np
 import math
-from scipy import stats
 import datetime
-from sklearn.naive_bayes import GaussianNB, MultinomialNB
-
 import progressbar
+from scipy import stats
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
 from multiprocessing import cpu_count, Pool
+
+import src.text as text
+import src.bow_feat as feat
+import src.cv_partition as cv
+import src.sign_test as st
 
 
 # save the training model into a file for later use
@@ -15,13 +19,13 @@ def save_to_file(prob_neg_vec, prob_pos_vec, prior_sentiment, vocab):
     # type prob_pos_vec: numpy array
     # type prior_sentiment: float
     # type vocab: list(str)
-    np.save("./nb_models/prob_neg_vector", prob_neg_vec)
-    np.save("./nb_models/prob_pos_vector", prob_pos_vec)
-    np.save("./nb_models/prior_sentiment", prior_sentiment)
-    np.save("./nb_models/vocabulary", vocab)
+    np.save("./models/nb_models/prob_neg_vector", prob_neg_vec)
+    np.save("./models/nb_models/prob_pos_vector", prob_pos_vec)
+    np.save("./models/nb_models/prior_sentiment", prior_sentiment)
+    np.save("./models/nb_models/vocabulary", vocab)
     readme_notes = np.array(["This model is trained on ", str(datetime.datetime.now())])
-    np.savetxt("./nb_models/readme.txt", readme_notes, fmt="%s")
-    np.savetxt("./nb_models/vocabulary_text.txt", vocab, fmt="%s")
+    np.savetxt("./models/nb_models/readme.txt", readme_notes, fmt="%s")
+    np.savetxt("./models/nb_models/vocabulary_text.txt", vocab, fmt="%s")
 
 
 # load the training model from the file 
@@ -31,17 +35,17 @@ def load_from_file():
     # type prior_sentiment: float
     # type vocab: list(str)
     try:
-        prob_neg_vec = np.load("./nb_models/prob_neg_vector.npy")
-        prob_pos_vec = np.load("./nb_models/prob_pos_vector.npy")
-        prior_sentiment = np.load("./nb_models/prior_sentiment.npy")
-        vocab = np.load("./nb_models/vocabulary.npy")
+        prob_neg_vec = np.load("./models/nb_models/prob_neg_vector.npy")
+        prob_pos_vec = np.load("./models/nb_models/prob_pos_vector.npy")
+        prior_sentiment = np.load("./models/nb_models/prior_sentiment.npy")
+        vocab = np.load("./models/nb_models/vocabulary.npy")
         return prob_neg_vec, prob_pos_vec, prior_sentiment, vocab
     
     except:
         print("\n--THE NB CLASSIFIER HAS NOT BEEN TRAINED --\n")
 
-    
 
+# train the Naive Bayes classifier & save models to file
 def train_nb_classifier(train_mat, train_c, vocab, smooth_type):
     # para train_mat: matrix of data & tags
     # para train_c: R^2 sentiment (neg/0 or pos/1)
@@ -85,6 +89,7 @@ def train_nb_classifier(train_mat, train_c, vocab, smooth_type):
     save_to_file(prob_neg_vec, prob_pos_vec, prior_sentiment, vocab)
 
 
+# test the Naive Bayes classifier & load models from file
 def test_nb_classifier(test_vec):
     # para prob_neg_vec: P(fi|0)
     # para prob_pos_vec: P(fi|1)
@@ -118,6 +123,10 @@ def save_results_cv(fold_type, feat_type, performances, perf_average, variance):
 
 # sklearn implementation of Naive Bayes classifier
 def sklearn_nb_classifier(train_reviews, train_labels, test_reviews_neg, test_reviews_pos):
+    # para train_reviews: training matrix that each row is a sample
+    # para train_labels: training labels that each element is 0/1
+    # para test_reviews_neg: negative test reviews
+    # para test_reviews_pos: positive test reviews
     model = MultinomialNB()
     
     print("\ntraining the sklearn NB classifier ...")
@@ -149,3 +158,88 @@ def visual_important_word(which_vec='neg'):
     for i in range(len(ind)):
         print(vocab[ind[i]], "\t", prob_vec_visual[ind[i]])
     print("---"*20)
+
+
+'''  Naive Bayes Classifier  '''
+def naive_bayes_classifier(feature_type, smoothing, cv_part=False, train_size_cv=None, test_size_cv=None, reviews_train_cv=None, reviews_test_cv=None):
+    # para feature_type: unigram or bigram (n-gram bag of words)
+    # para smoothing: the type of smoothing
+    # para cv_part: whether or not is is partitioned with cross-validation
+    print("\nNaive Bayes Classifier on sentiment detection running\n\npreparing data ...")
+    if not cv_part:
+        train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
+    else:
+        train_size, test_size, reviews_train, reviews_test = train_size_cv, test_size_cv, reviews_train_cv, reviews_test_cv
+    
+    print("\nfinding the corpus for the classifier ...")
+    # full vocabulary for the training reviews (frequency cutoff implemented)
+    if feature_type == 'unigram':
+        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9)
+    elif feature_type == 'bigram':
+        full_vocab = feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+    else:
+        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9) + feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+    vocab_length = len(full_vocab)
+    print("\n#features is ", vocab_length)
+    
+    print("\ngenerating the training matrix ...")
+    # training matrix of data
+    if feature_type == 'unigram':
+        train_matrix = feat.bag_words2vec_unigram(full_vocab, reviews_train)
+    elif feature_type == 'bigram':
+        train_matrix = feat.bag_words2vec_bigram(full_vocab, reviews_train)
+    else:
+        train_matrix = feat.concatenate_feat(feat.bag_words2vec_unigram(
+            full_vocab, reviews_train), feat.bag_words2vec_bigram(full_vocab, reviews_train))
+    print('\ndescription of training matrix', stats.describe(train_matrix))
+    
+    # training vector of labels
+    train_class_vector = np.hstack(
+        (feat.get_class_vec('neg', train_size), feat.get_class_vec('pos', train_size)))
+
+    print("\ntraining the Naive Bayes classifier ...")
+    # train the Naive Bayes classifier
+    train_nb_classifier(train_matrix, train_class_vector, full_vocab, smoothing)
+    print("\nthe training process, DONE. ")
+    
+    # parameters for testing
+    i, neg_correct, pos_correct = 0, 0, 0
+    classification_result = [0]*len(reviews_test)  # 0 for misclassification
+    print("\ntesting the Naive Bayes classifier ...")
+    # test the classifier with another review
+    for i in range(len(reviews_test)):
+        if feature_type == 'unigram':
+            test_vec = feat.words2vec_unigram(full_vocab, reviews_test[i])
+        elif feature_type == 'bigram':
+            test_vec = feat.words2vec_bigram(full_vocab, reviews_test[i])
+        else:
+            test_vec = np.array(feat.words2vec_unigram(
+                full_vocab, reviews_test[i])) + np.array(feat.words2vec_bigram(full_vocab, reviews_test[i]))
+
+        test_result = test_nb_classifier(test_vec)
+        if i < test_size:
+            '''neg review result=0'''
+            # print("Test sample %d \nThis review is %d review, 0 for neg" % (i, test_result))
+            if test_result == 0:
+                neg_correct += 1
+                classification_result[i] = 1
+        else:
+            '''pos review result=1'''
+            # print("Test sample %d \nThis review is %d review, 1 for pos" % (i, test_result))
+            if test_result == 1:
+                pos_correct += 1
+                classification_result[i] = 1
+
+    # print overall accuracy
+    neg_accuracy = (neg_correct/test_size)
+    pos_accuracy = (pos_correct/test_size)
+    overall_accuracy = sum(classification_result)/len(classification_result)
+    print("\naccuracy for negative reviews", neg_accuracy)
+    print("accuracy for positive reviews", pos_accuracy)
+    print("overall accuracy for this classifier", overall_accuracy)
+    
+    # save classification results to files
+    save_results(feature_type, vocab_length, train_size, smoothing, neg_accuracy, pos_accuracy, overall_accuracy)
+    print("\nclassification results written to file")
+
+    return classification_result

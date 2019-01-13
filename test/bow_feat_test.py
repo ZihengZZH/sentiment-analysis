@@ -9,7 +9,6 @@ unittest supports test automation, sharing of setup and shutdown code for tests,
 to run the unittest, python -m unittest test.bow_feat_test
 '''
 
-
 class BoWFeatureTest(unittest.TestCase):
     # method called to prepare the test fixture
     def setUp(self):

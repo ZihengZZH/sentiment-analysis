@@ -1,6 +1,5 @@
 import numpy as np
 from . import text
-
 import progressbar
 
 

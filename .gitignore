@@ -104,12 +104,12 @@ venv.bak/
 .mypy_cache/
 
 # project-specific
-/data
-/data-tagged
+/dataset
 /resources
 *.csv
 *.txt
 !todo.txt
 /.vscode
-/nb_models
-/svm_models
+/models
+/svm-light
+/log
