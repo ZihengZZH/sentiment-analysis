@@ -27,3 +27,7 @@ Two models in doc2vec:
 * distributed memory (PV-DM)
 * distributed bag of words (PV-DBOW)
 
+### note
+According to Le & Mikolov 2014, PV-DM alone usually works well for most tasks (with state-of-art performance), but its combination with PV-DBOW is usually more consistent across many tasks that they tried and therefore strongly recommended.
+
+In this project, however, contrary to the results of the paper, PV-DBOW alone performs as good as anything else. Concatenating vectors from different models only sometimes offers a tiny predictive improvement - and stays generally close to the best-performing solo model included.

@@ -5,6 +5,8 @@ import datetime
 import subprocess
 import progressbar
 from scipy import stats
+from sklearn import svm
+from sklearn import metrics
 
 import src.text as text
 import src.bow_feat as feat
@@ -42,8 +44,8 @@ def prepare_data_svm(train_test_matrix, train_test_size, test=False):
             train_test_data.append(["%d:%f" % (j+1, train_test_matrix[i][j]) for j in range(feat_size)])
             # write the label and data to file
             f.write("%d " % train_test_class_vector[i])
-            for j in range(len(train_test_data[i])):
-                f.write("%s " % train_test_data[i][j])
+            for k in range(len(train_test_data[i])):
+                f.write("%s " % train_test_data[i][k])
             f.write("\n")
     f.close()
 
@@ -60,7 +62,7 @@ def train_svm_classifier():
     assert os.path.isfile("./svm-light/svm_learn"), "SVM Light source code missing"
     assert os.path.isfile("./models/svm_models/train.dat"), "SVM training data missing"
     # run the SVM-Light classifier
-    subprocess.run(["./svm-light/svm_learn", "./models/svm_models/train.dat", "./models/svm_models/model"])
+    subprocess.run(["./svm-light/svm_learn", "-t 2", "./models/svm_models/train.dat", "./models/svm_models/model"])
     save_readme()
     
 
@@ -130,3 +132,51 @@ def SVM_classifier(feature_type, cv_part=False, train_size_cv=None, test_size_cv
     print("\ntest, DONE.")
 
     print("\nclassification results are shown as above")
+
+
+# train the SVM-Light classifier with doc2vec embeddings
+def train_svm_classifier_doc2vec():
+    # check if files available
+    assert os.path.isfile("./svm-light/svm_learn"), "SVM Light source code missing"
+    assert os.path.isfile("./models/doc2vec_models/train.dat"), "SVM training data missing"
+    # run the SVM-Light classifier
+    subprocess.run(["./svm-light/svm_learn", "./models/doc2vec_models/train.dat", "./models/doc2vec_models/model"])
+    save_readme()
+    
+
+# test the SVM-Light classifier with doc2vec embeddings
+def test_svm_classifier_doc2vec():
+    # check if files available
+    assert os.path.isfile("./svm-light/svm_classify"), "SVM Light source code missing"
+    assert os.path.isfile("./models/doc2vec_models/test.dat"), "SVM test data missing"
+    assert os.path.isfile("./models/doc2vec_models/model"), "SVM model data missing (SVM classifier is perhaps not trained yet.)"
+    # run the SVM-Light classifier
+    subprocess.run(["./svm-light/svm_classify", "./models/doc2vec_models/test.dat", "./models/doc2vec_models/model", "./models/doc2vec_models/predictions"])
+
+
+def SVM_classifier_doc2vec(X_train, y_train, X_test, y_test):
+    print("\ntrain the SVM classifier (with doc2vec embeddings) ... \n")
+    svm_doc2vec = svm.SVC(kernel='poly', C=1, degree=3, coef0=1, gamma='scale')
+    svm_doc2vec.fit(X_train, y_train)
+    print("\ntraining, DONE.")
+    
+    print("\ntest the SVM-Light classifier (with doc2vec embeddings) ... \n")
+    y_pred = svm_doc2vec.predict(X_test)
+    print(metrics.classification_report(y_test, y_pred))
+    print("Overall accuracy: ", round(metrics.accuracy_score(y_test, y_pred), 2))
+
+
+'''
+./svm-light/svm_learn [option] example_file model_file
+
+-t (int)
+0: linear (default)
+1: polynomial (s a*b+c)^d
+2. radial basis function exp(-gamma ||a-b||^2)
+3. sigmoid tanh(s a*b + c)
+4. user defined kernel from kernel.h
+
+-g (float)
+parameter gamma in rbf kernel
+
+'''

@@ -14,7 +14,6 @@ import src.doc2vec as doc2vec
 POS_TAGGING = False
 
 
-
 def cross_validation_10fold(fold_type, feature_type):
     # read data (avoid replication)
     neg_reviews = text.read_data_tag_from_file('neg')
@@ -48,5 +47,4 @@ def cross_validation_10fold(fold_type, feature_type):
 if __name__ == "__main__":
     # nb.naive_bayes_classifier("unigram", "laplace")
     # cross_validation_10fold('consecutive', 'unigram')
-    # svm.SVM_classifier("unigram")
-    doc2vec.para_embedding('dbow')
+    

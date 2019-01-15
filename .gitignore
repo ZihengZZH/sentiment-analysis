@@ -108,8 +108,10 @@ venv.bak/
 /resources
 *.csv
 *.txt
-!todo.txt
 /.vscode
 /models
 /svm-light
 /log
+/notebooks
+!model_list.txt
+!vocabulary_text.txt

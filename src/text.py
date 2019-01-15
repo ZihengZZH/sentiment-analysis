@@ -74,9 +74,11 @@ def visual_data_tag(tags):
         print(word.ljust(20), tag)
 
 
+'''ONLY EXECUTED ONCE'''
+# prepare the IMDB data (normalization and cleaning)
 def prepare_data_IMDB():
     dirname = 'aclImdb'
-    filename = '../dataset/aclImdb_v1.tar.gz'
+    filename = './dataset/aclImdb_v1.tar.gz'
     all_lines = []
     control_chars = [chr(0x85)] # Py3
 
@@ -89,7 +91,7 @@ def prepare_data_IMDB():
         norm_text = re.sub(r"([\.\",\(\)!\?;:])", " \\1", norm_text)
         return norm_text
 
-    if not os.path.isfile("../dataset/aclImdb/alldata-id.txt"):
+    if not os.path.isfile("./dataset/aclImdb/alldata-id.txt"):
         if not os.path.isdir(dirname):
             tar = tarfile.open(filename, mode='r')
             tar.extractall()
@@ -123,6 +125,5 @@ def prepare_data_IMDB():
                 num_line = u"_*{0} {1}\n".format(idx, line)
                 f.write(num_line.encode("utf-8"))
     
-    assert os.path.isfile("aclImdb/alldata-id.txt"), "alldata-id.txt unavailable"
-    print("success")
-
+    assert os.path.isfile("./dataset/aclImdb/alldata-id.txt"), "alldata-id.txt unavailable"
+    print("--SUCCESS--")

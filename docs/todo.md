@@ -10,20 +10,29 @@
    * ~~either the full vocabulary is built on training set or entire dataset~~
    * ~~normalize the text (lower case)~~
    * the NB classifier is too good when compared to sklearn built-in Gaussian NB classifier (83.5% > 70%), but similar to sklearn built-in Gaussian NB classifier (83.5% ～ 84.1%)
+   * While, after 10 folding averaging, the accuracy is only around 80%
 5. significance testing -- again
 6. POS tag -- w/ or w/o could make a difference in NB (Pang2002)
 7. ~~SVMLight as the implementation for the practical~~
    * classification accuracy: 80.5% precision: 85.88% recall: 73.0%
 8. word2vec implementation in Tensorflow
    * test on samples
-   *  
-9. ~~gensim python doc2vec library~~
-    * training algorithm (dm, dbow)
-    * the size of the feature vectors (100 dimensions)
-    * number of iterations / epochs (10 or 20)
+9. pre-train several doc2vec embeddings with different parameters
+    * ~~training algorithm (dm, dbow)~~
+    * ~~the size of the feature vectors (100 dimensions)~~
+    * ~~number of iterations / epochs (10 or 20)~~
     * context window
     * hierarchical softmax (faster version)
-10. use SVM-light classifier with doc2vec embedding
+    * ~~save the model into different directories~~
+10. use SVM-light classifier with doc2vec embeddings
+11. investigate the hyper-parameters of SVM-Light
+    * ~~what kind of SVM is SVM-Light? which kernel?~~
+    * How to tune the parameter?
+12. cross validation (train/valid/test)
+13. permutation test -- need to understand
+    * implement permutation test
+14. ~~train the various doc2vec models using the IMDB movie review database~~
+    * paragraph embeddings from original dataset refers to this model
 
 ## NOTES
 ---
