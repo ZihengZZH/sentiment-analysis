@@ -7,7 +7,6 @@ import multiprocessing
 import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
-import src.svm_classify as svm
 
 from collections import namedtuple
 from collections import OrderedDict
@@ -23,9 +22,10 @@ from gensim.test.test_doc2vec import ConcatenatedDoc2Vec
 
 NO_CORE = multiprocessing.cpu_count() * 3
 NO_EPOCH = 20
-SIZE_VECTOR = 150
-# CONTEXT WINDOW
-# HIERARCHICAL SOFTMAX
+SIZE_VECTOR = 100
+CONTEXT_WINDOW = 10
+NEGATIVE = 0
+HIERARCHICAL_SOFTMAX = 1
 
 DOC2VEC_PATH = './models/doc2vec_models/'
 DOC2VEC_LIST_PATH = './models/doc2vec_models/model_list.txt'
@@ -69,6 +69,7 @@ def load_model(model_no):
             if line_no == model_no - 1:
                 model_path = line.replace('\n', '')
                 model = doc2vec.Doc2Vec.load(model_path)
+                break
     return model
 
 
@@ -109,7 +110,7 @@ def load_vectors(model_name):
 def vector_4_learning(model, sentiment_reviews):
     # para model: a Doc2Vec object 
     # para sentiment_reviews
-    vectors = [model.docvecs[doc.tags[0]] for doc in sentiment_reviews]
+    vectors = [model.infer_vector(doc.words, alpha=.1) for doc in sentiment_reviews]
     labels = [doc.sentiment for doc in sentiment_reviews]
     return vectors, labels
 
@@ -138,7 +139,7 @@ def train_doc_embedding(test=False):
     '''
 
     if test:
-        model = doc2vec.Doc2Vec(dm=0, vector_size=SIZE_VECTOR, negative=5, hs=0, min_count=2, sample=0, epochs=NO_EPOCH, workers=NO_CORE)
+        model = doc2vec.Doc2Vec(dm=0, vector_size=SIZE_VECTOR, negative=NEGATIVE, hs=0, min_count=2, sample=0, epochs=NO_EPOCH, workers=NO_CORE)
         print("\nDBOW doc2vec model initialized.")
 
         print("\nbuild the vocabulary of doc2vec model ...")
@@ -155,12 +156,12 @@ def train_doc_embedding(test=False):
         model_list = []
         
         # PV-DBOW plain
-        model_list.append(doc2vec.Doc2Vec(dm=0, vector_size=SIZE_VECTOR, negative=5, hs=0, min_count=2, sample=0, epochs=NO_EPOCH, workers=NO_CORE))
+        model_list.append(doc2vec.Doc2Vec(dm=0, vector_size=SIZE_VECTOR, negative=NEGATIVE, hs=HIERARCHICAL_SOFTMAX, min_count=2, sample=0, epochs=NO_EPOCH, workers=NO_CORE))
         print("\nDBOW doc2vec model initialized.")
     
         # PV-DM w/ default averaging
         # a higher starting alpha may improve CBOW/PV-DM models
-        model_list.append(doc2vec.Doc2Vec(dm=1, vector_size=SIZE_VECTOR, window=10, negative=5, hs=0, min_count=2, sample=0, epochs=NO_EPOCH, workers=NO_CORE, alpha=0.05, comment='alpha=0.05'))
+        model_list.append(doc2vec.Doc2Vec(dm=1, vector_size=SIZE_VECTOR, window=CONTEXT_WINDOW, negative=NEGATIVE, hs=HIERARCHICAL_SOFTMAX, min_count=2, sample=0, epochs=NO_EPOCH, workers=NO_CORE, alpha=0.05, comment='alpha=0.05'))
         print("\nDM doc2vec model initialized.")
 
         # train and save different doc2vec models
@@ -187,11 +188,13 @@ def train_doc_embedding(test=False):
 
 
 # infer the doc2vec embedding for train/test reviews
-def infer_embedding(model, reviews, reviews_size):
-    # para model: a Doc2Vec model
+def infer_embedding(model_no, reviews, reviews_size):
+    # para model_no: which Doc2Vec model
     # para reviews: all reviews (training or test) 
     # type reviews: list(list(str))
     # type reviews_size: int
+    model = load_model(model_no)
+    print("description of the doc2vec model\t", str(model))
     sentiment_review = namedtuple('Sentiment_Review', 'words tags sentiment')
     allreviews = []
     bar = progressbar.ProgressBar()
@@ -205,26 +208,28 @@ def infer_embedding(model, reviews, reviews_size):
     vectors, labels = vector_4_learning(model, allreviews)
     return vectors, labels
 
+
+def test_doc_embedding():
+    alldocs = load_IMDB_data()
+    train_docs = [doc for doc in alldocs if doc.split == 'train']
+    test_docs = [doc for doc in alldocs if doc.split == 'test']
+    doc2vec_model = load_model(2)
+
+    def logistic_predictor_from_data(train_targets, train_regressors):
+        """Fit a statsmodel logistic predictor on supplied data"""
+        logit = sm.Logit(train_targets, train_regressors)
+        predictor = logit.fit(disp=0)
+        # print(predictor.summary())
+        return predictor
     
+    train_targets = [doc.sentiment for doc in train_docs]
+    train_regressors = [doc2vec_model.docvecs[doc.tags[0]] for doc in train_docs]
+    test_regressors = [doc2vec_model.docvecs[doc.tags[0]] for doc in test_docs]
 
-# prepare data for SVM-Light classifier
-def prepare_data_SVM(train_test_targets, train_test_vectors, test=False):
-    # para train_test_targets:
-    # para train_test_vectors:
-    # para test: either training data or test data preparation
-    path = './models/doc2vec_models/test.dat' if test else './models/doc2vec_models/train.dat'
-
-    # training or test data to store both data and labels
-    train_test_data = list()
-    feat_size = len(train_test_vectors[0])
-
-    bar = progressbar.ProgressBar()
-    with open(path, 'w', encoding='utf-8') as f:
-        for i in bar(range(len(train_test_vectors))):
-            train_test_data.append(["%d:%f" % (j+1, train_test_vectors[i][j]) for j in range(feat_size)])
-            # write the data along with labels to file
-            f.write("%d " % train_test_targets[i])
-            for k in range(len(train_test_data[i])):
-                f.write("%s " % train_test_data[i][k])
-            f.write("\n")
-    f.close()
+    predictor = logistic_predictor_from_data(train_targets, train_regressors)
+    test_predictions = predictor.predict(test_regressors)
+    corrects = sum(np.rint(test_predictions) == [doc.sentiment for doc in test_docs])
+    errors = len(test_predictions) - corrects
+    error_rate = float(errors) / len(test_predictions)
+    print("accuracy", corrects/len(test_predictions))
+    print(error_rate, errors, len(test_predictions), predictor)

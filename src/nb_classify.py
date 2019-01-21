@@ -9,7 +9,7 @@ from multiprocessing import cpu_count, Pool
 import src.text as text
 import src.bow_feat as feat
 import src.cv_partition as cv
-import src.sign_test as st
+import src.stats_test as st
 
 
 # save the training model into a file for later use

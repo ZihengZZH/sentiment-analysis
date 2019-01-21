@@ -1,6 +1,8 @@
 import numpy as np
 from . import text
 import progressbar
+import math
+import random
 
 
 def n_fold_cons(no_fold, length_data):
@@ -47,19 +49,23 @@ def partition(neg_reviews, pos_reviews, test=False):
     return train_size, test_size, reviews_train, reviews_test
 
 
-def prepare_data(pos=False):
+def prepare_data(tags=False, gridsearch=False):
     # prepare the data without partition
     # read all neg and pos reviews
-    if not pos:
+    if not tags:
         neg_reviews = text.read_data_from_file('neg')
         pos_reviews = text.read_data_from_file('pos')
     else:
         neg_reviews = text.read_data_tag_from_file('neg')
         pos_reviews = text.read_data_tag_from_file('pos')
 
-    print("\ntrain/test partitioning ...")
-
-    return partition(neg_reviews, pos_reviews)
+    if not gridsearch:
+        print("\ntrain/test partitioning ...")
+        return partition(neg_reviews, pos_reviews)
+    else:
+        splits_tenfold = n_fold_cons(10, 1000)
+        search_range = splits_tenfold[math.floor(random.random()*10)]
+        return prepare_data_tenfold(neg_reviews, pos_reviews, search_range)
 
 
 def prepare_data_tenfold(neg_reviews, pos_reviews, test_range):

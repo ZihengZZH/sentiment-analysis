@@ -48,6 +48,12 @@ class CVPartitionTest(unittest.TestCase):
             assert set(reviews_train[:train_size*2] + reviews_test[:test_size*2]) == set(range(1000))
             assert set(reviews_train[train_size*2:] + reviews_test[test_size*2:]) == set(range(1000))
 
+    def test_prepare_data_gridsearch(self):
+        for _ in range(10):
+            train_size, test_size, reviews_train, reviews_test = cv.prepare_data(tags=False, gridsearch=True)
+            assert train_size + test_size == 1000
+            assert len(reviews_train) == train_size*2
+            assert len(reviews_test) == test_size*2
 
 if __name__ == "__main__":
     unittest.main()
