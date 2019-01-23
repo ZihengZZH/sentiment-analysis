@@ -35,7 +35,7 @@
     * implement permutation test
 14. ~~train the various doc2vec models using the IMDB movie review database~~
     * paragraph embeddings from original dataset refers to this model
-15. concatenate doc2vec to infer document embeddings
+15. ~~concatenate doc2vec to infer document embeddings~~
 16. SVM performance error analysis
     * which documents does the system make the most catastrophic errors for (and why?)
     * goal: changes in algorithm or parameters to improve results

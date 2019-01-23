@@ -113,11 +113,12 @@ def save_results(feat_type, vocab_length, train_size, smoothing, neg_accuracy, p
 
 
 # write results to text file
-def save_results_cv(fold_type, feat_type, performances, perf_average, variance):
+def save_results_cv(fold_type, feat_type, results, performances, perf_average, variance):
     notes = "results obtained on " + str(datetime.datetime.now())
     f = open('./results/results_cv.txt', 'a+', encoding='utf-8')
-    f.write("\nfold type: %s\nfeature: %s\t#performance: %s\taverage performance: %f\tvariance: %f\tnotes: %s" % (
-        fold_type, feat_type, performances, perf_average, variance, notes))
+    f.write("fold type: %s\nfeature: %s\t#performance: %s\taverage performance: %f\tvariance: %f\tnotes: %s\n" % (fold_type, feat_type, performances, perf_average, variance, notes))
+    f.write(str(results))
+    f.write('\n')
     f.close()
 
 

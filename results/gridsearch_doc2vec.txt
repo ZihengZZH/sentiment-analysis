@@ -1,0 +1,22 @@
+Doc2Vec("alpha=0.05",dm/m,d100,hs,w10,mc2,t12){'C': 100, 'gamma': 0.0001, 'kernel': 'rbf'}	0.7811111111111111
+Doc2Vec("alpha=0.05",dm/m,d100,n5,w10,mc2,t12){'C': 100, 'kernel': 'linear'}	0.8194444444444444
+Doc2Vec("alpha=0.05",dm/m,d100,n5,w20,mc2,t12){'C': 10, 'gamma': 0.0001, 'kernel': 'rbf'}	0.82
+Doc2Vec("alpha=0.05",dm/m,d150,hs,w10,mc2,t12){'C': 1, 'gamma': 0.001, 'kernel': 'rbf'}	0.7861111111111111
+Doc2Vec("alpha=0.05",dm/m,d150,n5,w10,mc2,t12){'C': 1, 'gamma': 0.001, 'kernel': 'rbf'}	0.8244444444444444
+Doc2Vec("alpha=0.05",dm/m,d150,n5,w20,mc2,t12){'C': 1, 'gamma': 0.001, 'kernel': 'rbf'}	0.8177777777777778
+Doc2Vec(dbow,d100,hs,mc2,t12){'C': 1, 'kernel': 'linear'}	0.8672222222222222
+Doc2Vec(dbow,d100,n5,mc2,t12){'C': 1000, 'gamma': 0.0001, 'kernel': 'rbf'}	0.8783333333333333
+Doc2Vec(dbow,d150,hs,mc2,t12){'C': 1000, 'gamma': 0.0001, 'kernel': 'rbf'}	0.8633333333333333
+Doc2Vec(dbow,d150,n5,mc2,t12){'C': 100, 'gamma': 0.0001, 'kernel': 'rbf'}	0.8733333333333333
+Doc2Vec("alpha=0.05",dm/m,d100,hs,w10,mc2,t12){'C': 1, 'gamma': 0.001, 'kernel': 'rbf'}	0.795
+Doc2Vec("alpha=0.05",dm/m,d100,n5,w10,mc2,t12){'C': 10, 'gamma': 0.0001, 'kernel': 'rbf'}	0.8294444444444444
+Doc2Vec("alpha=0.05",dm/m,d100,n5,w20,mc2,t12){'C': 10, 'gamma': 0.0001, 'kernel': 'rbf'}	0.8277777777777777
+Doc2Vec("alpha=0.05",dm/m,d150,hs,w10,mc2,t12){'C': 100, 'gamma': 0.0001, 'kernel': 'rbf'}	0.7994444444444444
+Doc2Vec("alpha=0.05",dm/m,d150,n5,w10,mc2,t12){'C': 10, 'gamma': 0.0001, 'kernel': 'rbf'}	0.8388888888888889
+Doc2Vec("alpha=0.05",dm/m,d150,n5,w20,mc2,t12){'C': 1, 'gamma': 0.0001, 'kernel': 'rbf'}	0.8272222222222222
+Doc2Vec(dbow,d100,hs,mc2,t12){'C': 1, 'kernel': 'linear'}	0.8788888888888889
+Doc2Vec(dbow,d100,n5,mc2,t12){'C': 100, 'gamma': 0.001, 'kernel': 'rbf'}	0.8822222222222222
+Doc2Vec(dbow,d150,hs,mc2,t12){'C': 1000, 'gamma': 0.0001, 'kernel': 'rbf'}	0.8633333333333333
+Doc2Vec(dbow,d150,n5,mc2,t12){'C': 100, 'gamma': 0.001, 'kernel': 'rbf'}	0.8833333333333333
+Doc2Vec("alpha=0.05",dm/m,d150,n5,w10,mc2,t12)Doc2Vec(dbow,d100,n5,mc2,t12){'C': 10, 'gamma': 0.0001, 'kernel': 'rbf'}	0.8411111111111111
+Doc2Vec("alpha=0.05",dm/m,d150,n5,w10,mc2,t12)Doc2Vec(dbow,d150,n5,mc2,t12){'C': 10, 'gamma': 0.0001, 'kernel': 'rbf'}	0.8444444444444444

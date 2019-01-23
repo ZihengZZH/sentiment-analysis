@@ -10,6 +10,7 @@ from sklearn import svm
 from sklearn import metrics
 from sklearn.model_selection import GridSearchCV
 from smart_open import smart_open
+from collections import namedtuple
 
 import src.text as text
 import src.bow_feat as feat
@@ -29,6 +30,10 @@ svm_classify example1/test.dat example1/model example1/predictions
 SVM_BOW_PATH = './models/svm_models/bow_svm/'
 SVM_DOC2VEC_PATH = './models/svm_models/doc2vec_svm/'
 SVM_PARA_GRID_PATH = './results/gridsearch_doc2vec.txt'
+SVM_PARA_BOW_GRID_PATH = './results/gridsearch_bow.txt'
+parameters = namedtuple("Parameters", "kernel C gamma")
+svm_para_dbow = parameters(2, 100, 0.001)
+svm_para_dm = parameters(2, 10, 0.0001)
 
 
 # prepare the train/text data for SVM classifier
@@ -73,14 +78,15 @@ def save_readme(if_doc2vec=False):
 
 
 # train the SVM-Light classifier 
-def train_svm_classifier(if_doc2vec):
+def train_svm_classifier(if_doc2vec, dbow):
     # para if_doc2vec: bow features or doc2vec embeddings
     svm_path = SVM_DOC2VEC_PATH if if_doc2vec else SVM_BOW_PATH
     # check if files available
     assert os.path.isfile("./svm-light/svm_learn"), "SVM Light source code missing"
     assert os.path.isfile(svm_path + "train.dat"), "SVM training data missing"
+    (kernel, C, gamma) = (svm_para_dbow.kernel, svm_para_dbow.C, svm_para_dbow.gamma) if dbow else (svm_para_dm.kernel, svm_para_dm.C, svm_para_dm.gamma)
     # run the SVM-Light classifier
-    subprocess.run(["./svm-light/svm_learn", "-m", "100", svm_path + "train.dat", svm_path + "model"])
+    subprocess.run(["./svm-light/svm_learn", "-t", "%d" % kernel, "-c", "%f" % C, "-g", "%f" % gamma, "-m", "100", svm_path + "train.dat", svm_path + "model"])
     save_readme(if_doc2vec)
     
 
@@ -96,10 +102,12 @@ def test_svm_classifier(if_doc2vec):
     subprocess.run(["./svm-light/svm_classify", svm_path + "test.dat", svm_path + "model", svm_path + "predictions"])
 
 
-def SVM_classifier(feature_type, cv_part=False, if_doc2vec=False, model_no=1, train_size_cv=None, test_size_cv=None, reviews_train_cv=None, reviews_test_cv=None):
+def SVM_classifier(feature_type, cv_part=False, if_doc2vec=False, model_no=1, concatenate=False, train_size_cv=None, test_size_cv=None, reviews_train_cv=None, reviews_test_cv=None):
     # para feature_type: unigram or bigram (n-gram bag of words)
     # para cv_part: whether or not is partitioned with cross-validation
     # para if_doc2vec: bow features or doc2vec embeddings
+    # para model_no: which doc2vec model to use / list if concatenate
+    # para concatenate: whether to concatenate two doc2vec models
     print("\nSVM-Light Classifier on sentiment detection running\n\npreparing data ...")
     if not cv_part:
         train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
@@ -141,17 +149,32 @@ def SVM_classifier(feature_type, cv_part=False, if_doc2vec=False, model_no=1, tr
         print('\ndescription of test matrix', stats.describe(test_matrix))
     
     else:
-        print("\ninfer document embeddings with pre-trained no.%d doc2vec model ..." % model_no)
-        train_matrix, train_labels = doc2vec.infer_embedding(model_no, reviews_train, train_size)
-        test_matrix, test_labels = doc2vec.infer_embedding(model_no, reviews_test, test_size)
+        if concatenate:
+            print("\ninfer document embeddings with pre-trained no.%d doc2vec model and no.%d doc2vec model ..." % (model_no[0], model_no[1]))
+            train_matrix, train_labels = doc2vec.infer_embedding(model_no, reviews_train, train_size, concatenate)
+            test_matrix, test_labels = doc2vec.infer_embedding(model_no, reviews_test, test_size, concatenate)
+        else:
+            print("\ninfer document embeddings with pre-trained no.%d doc2vec model ..." % model_no)
+            train_matrix, train_labels = doc2vec.infer_embedding(model_no, reviews_train, train_size, False)
+            test_matrix, test_labels = doc2vec.infer_embedding(model_no, reviews_test, test_size, False)
 
     print("\nprepare the data for the SVM-Light classifier ...")
     prepare_data(train_matrix, train_size, if_doc2vec)
     prepare_data(test_matrix, test_size, if_doc2vec, test=True)
     print("\ndata preparation, DONE")
 
+    # check the algorithm of doc2vec model
+    if model_no == 18 or model_no == 20:
+        dbow = True
+    elif model_no == 15:
+        dbow = False
+    elif concatenate:
+        dbow = False
+    else:
+        dbow = None
+    
     print("\ntrain the SVM-Light classifier ... \n")
-    train_svm_classifier(if_doc2vec)
+    train_svm_classifier(if_doc2vec, dbow)
     print("\ntraining, DONE.")
     
     print("\ntest the SVM-Light classifier ... \n")
@@ -160,12 +183,28 @@ def SVM_classifier(feature_type, cv_part=False, if_doc2vec=False, model_no=1, tr
 
     print("\nclassification results are shown as above")
 
+    def read_predictions():
+        svm_path = SVM_DOC2VEC_PATH if if_doc2vec else SVM_BOW_PATH
+        misclassify, results = 0, []
+        with smart_open(svm_path + 'predictions', 'r') as f:
+            for line in f:
+                line = line.strip()
+                results.append(float(line))
+        for i in range(len(results)):
+            if i < test_size and results[i] > 0:
+                misclassify += 1
+            elif i > test_size and results[i] < 0:
+                misclassify += 1
+        return (len(results) - misclassify) / len(results)
+    
+    return read_predictions()
+
 
 def SVM_classifier_sklearn(model_no):
     # para model_no: which Doc2Vec model to use
     train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
-    train_matrix, train_labels = doc2vec.infer_embedding(model_no, reviews_train, train_size)
-    test_matrix, test_labels = doc2vec.infer_embedding(model_no, reviews_test, test_size)
+    train_matrix, train_labels = doc2vec.infer_embedding(model_no, reviews_train, train_size, False)
+    test_matrix, test_labels = doc2vec.infer_embedding(model_no, reviews_test, test_size, False)
     X_train, y_train, X_test, y_test = train_matrix, train_labels, test_matrix, test_labels
     print("\ntrain the sklearn SVM classifier (with doc2vec embeddings) ... \n")
     svm_doc2vec = svm.SVC(kernel='rbf', C=10, degree=3, gamma='auto')
@@ -177,18 +216,19 @@ def SVM_classifier_sklearn(model_no):
     print("Overall accuracy: ", round(metrics.accuracy_score(y_test, y_pred), 2))
 
 
-def SVM_grid_search(model_no):
+def SVM_grid_search_doc2vec(model_no, concatenate):
     # para model_no: which Doc2Vec model to use
     train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
-    train_matrix, train_labels = doc2vec.infer_embedding(model_no, reviews_train, train_size)
-    test_matrix, test_labels = doc2vec.infer_embedding(model_no, reviews_test, test_size)
+    train_matrix, train_labels = doc2vec.infer_embedding(model_no, reviews_train, train_size, concatenate)
+    test_matrix, test_labels = doc2vec.infer_embedding(model_no, reviews_test, test_size, concatenate)
     X_train, y_train, X_test, y_test = train_matrix, train_labels, test_matrix, test_labels
+
     print("\nrun the Grid Search for SVM classifier (with doc2vec embeddings) ... \n")
     tuned_parameters = [
         {'kernel': ['rbf'], 'gamma': [1e-3, 1e-4], 'C': [1, 10, 100, 1000]},
         {'kernel': ['linear'], 'C': [1, 10, 100, 1000]}
         ]
-    clf = GridSearchCV(svm.SVC(), tuned_parameters, cv=10, n_jobs=12, verbose=10)
+    clf = GridSearchCV(svm.SVC(), tuned_parameters, cv=3, n_jobs=12, verbose=10)
     clf.fit(X_train, y_train)
     print("\ngrid search, DONE.")
     print("\ngrid search results are listed as follows.")
@@ -196,7 +236,63 @@ def SVM_grid_search(model_no):
     sorted(clf.cv_results_.keys())
     
     with smart_open(SVM_PARA_GRID_PATH, 'a+', encoding='utf-8') as f:
-        line = str(doc2vec.load_model(model_no)) + str(clf.best_params_) + "\t" + str(clf.best_score_)
+        model_name = str(doc2vec.load_model(model_no)) if not concatenate else (str(doc2vec.load_model(model_no[0])) + str(doc2vec.load_model(model_no[1])))
+        line = model_name + str(clf.best_params_) + "\t" + str(clf.best_score_)
+        f.write(line)
+        f.write("\n")
+    print("\ngrid search results are written to file.")
+
+
+def SVM_grid_search_bow(feature_type):
+    train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
+    if feature_type == 'unigram':
+        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9)
+    elif feature_type == 'bigram':
+        full_vocab = feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+    else:
+        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9) + feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+    vocab_length = len(full_vocab)
+    print("\n#features is ", vocab_length)
+
+    print("\ngenerate the BOW-based training matrix ...")
+    # training matrix of data
+    if feature_type == 'unigram':
+        train_matrix = feat.bag_words2vec_unigram(full_vocab, reviews_train)
+    elif feature_type == 'bigram':
+        train_matrix = feat.bag_words2vec_bigram(full_vocab, reviews_train)
+    else:
+        train_matrix = feat.concatenate_feat(feat.bag_words2vec_unigram(
+            full_vocab, reviews_train), feat.bag_words2vec_bigram(full_vocab, reviews_train))
+    print('\ndescription of training matrix', stats.describe(train_matrix))
+
+    print("\ngenerate the BOW-based test matrix ...")
+    # testing matrix of data
+    if feature_type == 'unigram':
+        test_matrix = feat.bag_words2vec_unigram(full_vocab, reviews_test)
+    elif feature_type == 'bigram':
+        test_matrix = feat.bag_words2vec_bigram(full_vocab, reviews_test)
+    else:
+        test_matrix = feat.concatenate_feat(feat.bag_words2vec_unigram(
+            full_vocab, reviews_test), feat.bag_words2vec_bigram(full_vocab, reviews_test))
+    print('\ndescription of test matrix', stats.describe(test_matrix))
+
+    train_labels = np.hstack((np.ones(train_size)*-1, np.ones(train_size)))
+    X_train, y_train = train_matrix, train_labels
+
+    print("\nrun the Grid Search for SVM classifier (with bow features) ... \n")
+    tuned_parameters = [
+        {'kernel': ['rbf'], 'gamma': [1e-2, 1e-3, 1e-4], 'C': [1, 10, 100, 1000, 10000]},
+        {'kernel': ['linear'], 'C': [1, 10, 100, 1000, 10000]}
+        ]
+    clf = GridSearchCV(svm.SVC(), tuned_parameters, cv=3, n_jobs=12, verbose=10)
+    clf.fit(X_train, y_train)
+    print("\ngrid search, DONE.")
+    print("\ngrid search results are listed as follows.")
+    print(clf.best_params_, clf.best_score_)
+    sorted(clf.cv_results_.keys())
+    
+    with smart_open(SVM_PARA_BOW_GRID_PATH, 'a+', encoding='utf-8') as f:
+        line = str(feature_type) + "\t" + str(clf.best_params_) + "\t" + str(clf.best_score_)
         f.write(line)
         f.write("\n")
     print("\ngrid search results are written to file.")
@@ -204,8 +300,8 @@ def SVM_grid_search(model_no):
 
 def logistic_predictor(model_no):
     train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
-    train_matrix, train_labels = doc2vec.infer_embedding(model_no, reviews_train, train_size)
-    test_matrix, test_labels = doc2vec.infer_embedding(model_no, reviews_test, test_size)
+    train_matrix, train_labels = doc2vec.infer_embedding(model_no, reviews_train, train_size, False)
+    test_matrix, test_labels = doc2vec.infer_embedding(model_no, reviews_test, test_size, False)
     # X_train, y_train, X_test, y_test = train_matrix, train_labels, test_matrix, test_labels
 
     logit = statsmodels.api.Logit(train_labels, train_matrix)
@@ -218,6 +314,25 @@ def logistic_predictor(model_no):
     errors = len(test_predictions) - corrects
     error_rate = float(errors) / len(test_predictions)
     print("accuracy", corrects/len(test_predictions))
+
+
+def save_results(feat_type, doc2vec, train_size, classification):
+    if_doc2vec = 1 if doc2vec else 0
+    notes = "results obtained on " + str(datetime.datetime.now())
+    f = open('./results/results.txt', 'a+', encoding='utf-8')
+    f.write("\nfeature: %s\tif_doc2vec: %d\ttraining size: %d\tclassification_accuracy: %f\tnotes: %s" % (
+        feat_type, if_doc2vec, train_size, classification, notes))
+    f.close()
+
+
+def save_results_cv(fold_type, feat_type, doc2vec, results, performances, perf_average, variance):
+    if_doc2vec = 1 if doc2vec else 0
+    notes = "results obtained on " + str(datetime.datetime.now())
+    f = open('./results/results_cv.txt', 'a+', encoding='utf-8')
+    f.write("fold type: %s\nfeature: %s\t#performance: %s\taverage performance: %f\tvariance: %f\tnotes: %s\tdoc2vec: %d\n" % (fold_type, feat_type, performances, perf_average, variance, notes, if_doc2vec))
+    f.write(str(results))
+    f.write('\n')
+    f.close()
 
 
 '''

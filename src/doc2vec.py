@@ -40,8 +40,8 @@ def load_IMDB_data():
             tokens = gensim.utils.to_unicode(line).split()
             words = tokens[1:]
             tags = [line_no]
-            split = ['train', 'test', 'extra', 'extra'][line_no // 25000] # 25k train, 25k test, 25k extra as pos, 25 extra as neg
-            sentiment = [1.0, 0.0, 1.0, 0.0, None, None, None, None][line_no//12500] # [12.5k pos, 12.5k neg] * 2 then unknown
+            split = ['train', 'test', 'extra', 'extra'][line_no // 25000] # 25k train, 25k test, 25k extra as pos, 25k extra as neg
+            sentiment = [1.0, 0.0, 1.0, 0.0, None, None, None, None][line_no // 12500] # [12.5k pos, 12.5k neg] * 2 then unknown
             alldocs.append(sentiment_document(words, tags, split, sentiment))
     return alldocs
 
@@ -188,13 +188,22 @@ def train_doc_embedding(test=False):
 
 
 # infer the doc2vec embedding for train/test reviews
-def infer_embedding(model_no, reviews, reviews_size):
-    # para model_no: which Doc2Vec model
+def infer_embedding(model_no, reviews, reviews_size, concatenate):
+    # para model_no: which Doc2Vec model / list if concatenate
     # para reviews: all reviews (training or test) 
     # type reviews: list(list(str))
     # type reviews_size: int
-    model = load_model(model_no)
-    print("description of the doc2vec model\t", str(model))
+    # para concatenate: whether to concatenate two doc2vec models
+    if not concatenate:
+        model = load_model(model_no)
+        print("description of the doc2vec model\t", str(model))
+    else:
+        model_1 = load_model(model_no[0])
+        model_2 = load_model(model_no[1])
+        print("description of the 1st doc2vec model\t", str(model_1))
+        print("description of the 2nd doc2vec model\t", str(model_2))
+        model = ConcatenatedDoc2Vec([model_1, model_2])
+    
     sentiment_review = namedtuple('Sentiment_Review', 'words tags sentiment')
     allreviews = []
     bar = progressbar.ProgressBar()

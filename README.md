@@ -28,18 +28,24 @@ Two models in doc2vec:
 * distributed bag of words (PV-DBOW)
 
 Full table of doc2vec models pre-trained in the project:
-| index | algorithm | vector size | window size | negative samples | hierarchical softmax | epochs |
-| -- | -- | -- | -- | -- | -- | -- | 
-| 1 | DM | 100 | 10 | NA | Y | 10/20 |
-| 2 | DM | 100 | 10 | 5 | NA | 10/20 |
-| 3 | DM | 100 | 20 | 5 | NA | 10/20 |
-| 4 | DM | 150 | 10 | NA | Y | 10/20 |
-| 5 | DM | 150 | 10 | 5 | NA | 10/20 |
-| 6 | DM | 150 | 20 | 5 | NA | 10/20 |
-| 7 | DBOW | 100 | NA | NA | Y | 10/20 |
-| 8 | DBOW | 100 | NA | 5 | NA | 10/20 |
-| 9 | DBOW | 150 | NA | NA | Y | 10/20 |
-| 10 | DBOW | 150 | NA | 5 | NA | 10/20 |
+| index | algorithm | vector size | window size | negative samples | hierarchical softmax | epochs | accuracy |
+| -- | -- | -- | -- | -- | -- | -- | -- |
+| 1 | DM | 100 | 10 | NA | Y | 10/20 | 78.1% / 79.5% |
+| 2 | DM | 100 | 10 | 5 | NA | 10/20 | 81.9% / 82.9% |
+| 3 | DM | 100 | 20 | 5 | NA | 10/20 | 82.0% / 82.8% |
+| 4 | DM | 150 | 10 | NA | Y | 10/20 | 78.6% / 79.9% |
+| 5 | DM | 150 | 10 | 5 | NA | 10/20 | 82.4% / __83.9%__ |
+| 6 | DM | 150 | 20 | 5 | NA | 10/20 | 81.8% / 82.7% |
+| 7 | DBOW | 100 | NA | NA | Y | 10/20 | 86.7% / 87.9% |
+| 8 | DBOW | 100 | NA | 5 | NA | 10/20 | 87.8% / __88.2%__ |
+| 9 | DBOW | 150 | NA | NA | Y | 10/20 | 86.3% / 86.3% |
+| 10 | DBOW | 150 | NA | 5 | NA | 10/20 | 87.3 % / __88.3%__ |
+
+Concatenated Doc2Vec models
+| index | dm model id | dbow model id | accuracy |
+| -- | -- | -- | -- |
+| 1 | 15 | 18 | 84.1% |
+| 2 | 15 | 20 | 84.4% | 
 
 
 ### note 1

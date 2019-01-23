@@ -116,3 +116,4 @@ venv.bak/
 !model_list.txt
 !vocabulary_text.txt
 !/dataset/data-IMDB
+!/results
