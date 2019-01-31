@@ -31,3 +31,48 @@ feature: both	#feature: 17480	training size: 900	smooth: laplace	neg_accuracy: 0
 feature: both	#feature: 17519	training size: 900	smooth: laplace	neg_accuracy: 0.810000	pos_accuracy: 0.760000	classification_accuracy: 0.785000	notes: results obtained on 2019-01-23 17:53:02.906480
 feature: both	#feature: 17585	training size: 900	smooth: laplace	neg_accuracy: 0.870000	pos_accuracy: 0.840000	classification_accuracy: 0.855000	notes: results obtained on 2019-01-23 17:56:38.996176
 
+
+'''CHANGE CUTOFF FREQ AND LAPLACE SMOOTHING'''
+
+feature: unigram	#feature: 9541	training size: 900	smooth: laplace	neg_accuracy: 0.910000	pos_accuracy: 0.760000	classification_accuracy: 0.835000	notes: results obtained on 2019-01-25 11:07:47.765621
+feature: unigram	#feature: 9511	training size: 900	smooth: laplace	neg_accuracy: 0.860000	pos_accuracy: 0.750000	classification_accuracy: 0.805000	notes: results obtained on 2019-01-25 11:08:09.689794
+feature: unigram	#feature: 9536	training size: 900	smooth: laplace	neg_accuracy: 0.840000	pos_accuracy: 0.710000	classification_accuracy: 0.775000	notes: results obtained on 2019-01-25 11:08:32.941242
+feature: unigram	#feature: 9476	training size: 900	smooth: laplace	neg_accuracy: 0.880000	pos_accuracy: 0.800000	classification_accuracy: 0.840000	notes: results obtained on 2019-01-25 11:08:55.207679
+feature: unigram	#feature: 9450	training size: 900	smooth: laplace	neg_accuracy: 0.900000	pos_accuracy: 0.770000	classification_accuracy: 0.835000	notes: results obtained on 2019-01-25 11:09:17.374216
+feature: unigram	#feature: 9451	training size: 900	smooth: laplace	neg_accuracy: 0.840000	pos_accuracy: 0.760000	classification_accuracy: 0.800000	notes: results obtained on 2019-01-25 11:09:39.776182
+feature: unigram	#feature: 9470	training size: 900	smooth: laplace	neg_accuracy: 0.860000	pos_accuracy: 0.720000	classification_accuracy: 0.790000	notes: results obtained on 2019-01-25 11:10:04.275854
+feature: unigram	#feature: 9424	training size: 900	smooth: laplace	neg_accuracy: 0.800000	pos_accuracy: 0.830000	classification_accuracy: 0.815000	notes: results obtained on 2019-01-25 11:10:29.981490
+feature: unigram	#feature: 9495	training size: 900	smooth: laplace	neg_accuracy: 0.830000	pos_accuracy: 0.720000	classification_accuracy: 0.775000	notes: results obtained on 2019-01-25 11:10:51.910527
+feature: unigram	#feature: 9482	training size: 900	smooth: laplace	neg_accuracy: 0.880000	pos_accuracy: 0.810000	classification_accuracy: 0.845000	notes: results obtained on 2019-01-25 11:11:13.887322
+
+
+feature: bigram	#feature: 9544	training size: 900	smooth: laplace	neg_accuracy: 0.860000	pos_accuracy: 0.810000	classification_accuracy: 0.835000	notes: results obtained on 2019-01-25 11:12:58.825699
+feature: bigram	#feature: 9517	training size: 900	smooth: laplace	neg_accuracy: 0.840000	pos_accuracy: 0.780000	classification_accuracy: 0.810000	notes: results obtained on 2019-01-25 11:14:41.172697
+feature: bigram	#feature: 9538	training size: 900	smooth: laplace	neg_accuracy: 0.800000	pos_accuracy: 0.700000	classification_accuracy: 0.750000	notes: results obtained on 2019-01-25 11:16:20.382691
+feature: bigram	#feature: 9556	training size: 900	smooth: laplace	neg_accuracy: 0.860000	pos_accuracy: 0.820000	classification_accuracy: 0.840000	notes: results obtained on 2019-01-25 11:17:59.577886
+feature: bigram	#feature: 9433	training size: 900	smooth: laplace	neg_accuracy: 0.800000	pos_accuracy: 0.780000	classification_accuracy: 0.790000	notes: results obtained on 2019-01-25 11:19:39.122838
+feature: bigram	#feature: 9465	training size: 900	smooth: laplace	neg_accuracy: 0.850000	pos_accuracy: 0.740000	classification_accuracy: 0.795000	notes: results obtained on 2019-01-25 11:21:20.616443
+feature: bigram	#feature: 9459	training size: 900	smooth: laplace	neg_accuracy: 0.880000	pos_accuracy: 0.750000	classification_accuracy: 0.815000	notes: results obtained on 2019-01-25 11:23:00.374569
+feature: bigram	#feature: 9467	training size: 900	smooth: laplace	neg_accuracy: 0.800000	pos_accuracy: 0.800000	classification_accuracy: 0.800000	notes: results obtained on 2019-01-25 11:24:39.678385
+feature: bigram	#feature: 9473	training size: 900	smooth: laplace	neg_accuracy: 0.840000	pos_accuracy: 0.780000	classification_accuracy: 0.810000	notes: results obtained on 2019-01-25 11:26:19.336861
+feature: bigram	#feature: 9558	training size: 900	smooth: laplace	neg_accuracy: 0.830000	pos_accuracy: 0.850000	classification_accuracy: 0.840000	notes: results obtained on 2019-01-25 11:28:05.381133
+
+
+feature: both	#feature: 19085	training size: 900	smooth: laplace	neg_accuracy: 0.900000	pos_accuracy: 0.810000	classification_accuracy: 0.855000	notes: results obtained on 2019-01-25 11:40:26.761285
+feature: both	#feature: 19028	training size: 900	smooth: laplace	neg_accuracy: 0.850000	pos_accuracy: 0.780000	classification_accuracy: 0.815000	notes: results obtained on 2019-01-25 11:44:24.348901
+feature: both	#feature: 19074	training size: 900	smooth: laplace	neg_accuracy: 0.840000	pos_accuracy: 0.730000	classification_accuracy: 0.785000	notes: results obtained on 2019-01-25 11:48:24.869484
+feature: both	#feature: 19032	training size: 900	smooth: laplace	neg_accuracy: 0.880000	pos_accuracy: 0.850000	classification_accuracy: 0.865000	notes: results obtained on 2019-01-25 11:52:22.975409
+feature: both	#feature: 18883	training size: 900	smooth: laplace	neg_accuracy: 0.860000	pos_accuracy: 0.790000	classification_accuracy: 0.825000	notes: results obtained on 2019-01-25 11:56:29.881392
+feature: both	#feature: 18916	training size: 900	smooth: laplace	neg_accuracy: 0.840000	pos_accuracy: 0.790000	classification_accuracy: 0.815000	notes: results obtained on 2019-01-25 12:00:48.420038
+feature: both	#feature: 18929	training size: 900	smooth: laplace	neg_accuracy: 0.870000	pos_accuracy: 0.730000	classification_accuracy: 0.800000	notes: results obtained on 2019-01-25 12:05:01.471777
+feature: both	#feature: 18891	training size: 900	smooth: laplace	neg_accuracy: 0.810000	pos_accuracy: 0.830000	classification_accuracy: 0.820000	notes: results obtained on 2019-01-25 12:09:18.025014
+feature: both	#feature: 18968	training size: 900	smooth: laplace	neg_accuracy: 0.820000	pos_accuracy: 0.750000	classification_accuracy: 0.785000	notes: results obtained on 2019-01-25 12:13:30.822853
+feature: both	#feature: 19040	training size: 900	smooth: laplace	neg_accuracy: 0.890000	pos_accuracy: 0.830000	classification_accuracy: 0.860000	notes: results obtained on 2019-01-25 12:17:43.511872
+
+'''TEST'''
+feature: unigram	#feature: 9482	training size: 900	smooth: laplace	neg_accuracy: 0.880000	pos_accuracy: 0.810000	classification_accuracy: 0.845000	notes: results obtained on 2019-01-31 02:24:49.425106
+feature: bigram	#feature: 9558	training size: 900	smooth: laplace	neg_accuracy: 0.830000	pos_accuracy: 0.850000	classification_accuracy: 0.840000	notes: results obtained on 2019-01-31 02:26:24.329776
+feature: both	#feature: 19040	training size: 900	smooth: laplace	neg_accuracy: 0.890000	pos_accuracy: 0.830000	classification_accuracy: 0.860000	notes: results obtained on 2019-01-31 02:30:10.874869
+feature: unigram	#feature: 9482	training size: 900	smooth: laplace	neg_accuracy: 0.880000	pos_accuracy: 0.810000	classification_accuracy: 0.845000	notes: results obtained on 2019-01-31 02:42:28.930594
+feature: bigram	#feature: 9558	training size: 900	smooth: laplace	neg_accuracy: 0.830000	pos_accuracy: 0.850000	classification_accuracy: 0.840000	notes: results obtained on 2019-01-31 02:44:01.459652
+feature: both	#feature: 19040	training size: 900	smooth: laplace	neg_accuracy: 0.890000	pos_accuracy: 0.830000	classification_accuracy: 0.860000	notes: results obtained on 2019-01-31 02:47:41.052476

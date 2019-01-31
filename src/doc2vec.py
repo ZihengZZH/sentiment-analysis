@@ -177,13 +177,6 @@ def train_doc_embedding(test=False):
             save_model(model, model_name)
             print("\ntraining DONE and %s doc2vec model saved to file" % model_name)
         
-        # PV-DBOW + PV-DM combining two paragraph vectors to improve performance
-        # ConcatenatedDoc2Vec object has no attribute 'save' (cannot be saved)
-        # model_dbow_dm = ConcatenatedDoc2Vec([model_list[0], model_list[1]])
-        # print("\nDBOW+DM doc2vec model initialized.\nlater concatenation of output-vectors, so no need to train")
-        # model_dbow_dm_name = str(model_list[0]) + str(model_list[1]).replace('/', '-')
-        # save_model(model_dbow_dm, model_dbow_dm_name)
-        
         print("\nALL doc2vec models saved.")
 
 
@@ -242,3 +235,94 @@ def test_doc_embedding():
     error_rate = float(errors) / len(test_predictions)
     print("accuracy", corrects/len(test_predictions))
     print(error_rate, errors, len(test_predictions), predictor)
+
+
+'''CHECK WHETHER DOC2VEC MAKES SENSE'''
+def examine_results(model_no, reviews, reviews_size):
+    # para model_no: which Doc2Vec to use
+    # para reviews: test reviews to examine the results
+    alldocs = load_IMDB_data()
+    sentiment_review = namedtuple('Sentiment_Review', 'words tags sentiment')
+    allreviews = []
+    bar = progressbar.ProgressBar()
+    for i in bar(range(len(reviews))):
+        tags = [i]
+        if i < reviews_size:
+            allreviews.append(sentiment_review(reviews[i], tags, 0.))
+        else:
+            allreviews.append(sentiment_review(reviews[i], tags, 1.))
+    
+    # load the model & generate the target doc id
+    model = load_model(model_no)
+    doc_id = np.random.randint(0, len(allreviews))
+
+    # save results to file
+    with smart_open('./results/examine_doc2vec_%d.txt' % model_no, 'w', encoding='utf-8') as f:
+        
+        '''ARE INFERRED VECTORS CLOSE TO PRECALCULATED ONES?'''
+        print("for doc %d ..." % doc_id)
+        f.write("for doc %d ..." % doc_id)
+        f.write("\n")
+        # infer document vector of the target
+        inferred_docvec = model.infer_vector(allreviews[doc_id].words)
+        print("%s:\n %s" % (model, model.docvecs.most_similar([inferred_docvec], topn=3)))
+        f.write("%s:\n %s" % (model, model.docvecs.most_similar([inferred_docvec], topn=3)))
+        f.write("\n")
+
+        ''''DO CLOSE DOCUMENTS SEEM MORE RELATED THAN DISTANT ONES?'''
+        sims = model.docvecs.most_similar(doc_id, topn=len(allreviews)) # get all similar documents
+        print("Target (%d): <<%s>>\n" % (doc_id, ' '.join(allreviews[doc_id].words)))
+        f.write("Target (%d): <<%s>>\n" % (doc_id, ' '.join(allreviews[doc_id].words)))
+        f.write("\n")
+        # output the most, median, least similar documents to the target
+        for label, index in [('MOST', 0), ('MEDIAN', len(sims)//2), ('LEAST', len(sims) - 1)]:
+            print("%s %s: <<%s>>\n" % (label, sims[index], ' '.join(alldocs[sims[index][0]].words)))
+            f.write("%s %s: <<%s>>\n" % (label, sims[index], ' '.join(alldocs[sims[index][0]].words)))
+            f.write("\n")
+        
+        '''DO WORD VECTORS SHOW USEFUL SIMILARITIES?'''
+        word = 'great'
+        # choose the top 20 similar words to 'great'
+        similar_words = str(model.wv.most_similar(word, topn=20))
+        print("most similar word %s for model %s are as follows\n" % (word, model))
+        f.write("most similar word %s for model %s are as follows\n" % (word, model))
+        f.write("\n")
+        print(similar_words)
+        f.write(similar_words)
+        f.write("\n")
+    
+    print("\nexamination, DONE.")
+
+
+'''PREPARE DATA FOR TENSORFLOW VISUALIZATION'''
+def process_metadata(model_no, train_reviews, test_reviews):
+    # para train/test reviews: all reviews to be saved
+    train_size = int(len(train_reviews)/2)
+    test_size = int(len(test_reviews)/2)
+    print("\ninferring embeddings for each document ...")
+    train_vectors, train_labels = infer_embedding(model_no, train_reviews, train_size, False)
+    test_vectors, test_labels = infer_embedding(model_no, test_reviews, test_size, False)
+
+    print("\nprocessing reviews following their sentiment")
+    # for better illustration
+    pos_vectors = train_vectors[:train_size] + test_vectors[:test_size]
+    neg_vectors = train_vectors[train_size:] + test_vectors[test_size:]
+
+    print("\nsaving embeddings to metadata file ...")
+    with smart_open("./results/label.tsv", "w", encoding='utf-8') as f:
+        f.write("Index\tLabel\n")
+        for i in range(2000):
+            label = 0 if i < 1000 else 1
+            f.write("%d\t%d\n" % (i, label))
+        
+    with smart_open("./results/metadata.tsv", "w", encoding='utf-8') as f:
+        for i in range(len(pos_vectors)):
+            for j in range(len(pos_vectors[i])):
+                f.write("%f\t" % pos_vectors[i][j])
+            f.write("\n")
+        for k in range(len(neg_vectors)):
+            for l in range(len(neg_vectors[k])):
+                f.write("%f\t" % neg_vectors[k][l])
+            f.write("\n")
+    print("\nmetadata processing, DONE")
+    

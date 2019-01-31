@@ -67,7 +67,7 @@ def train_nb_classifier(train_mat, train_c, vocab, smooth_type):
 
     # check whether smoothing or not
     if smooth_type == 'laplace':
-        k = 1.0  # constant for all words
+        k = 2.0  # constant for all words
     else:
         k = 0.0
 
@@ -77,14 +77,14 @@ def train_nb_classifier(train_mat, train_c, vocab, smooth_type):
     for i in bar(range(no_train_review)):
         if train_c[i] == 0:
             prob_neg_num += train_mat[i]
-            prob_neg_denom += (sum(train_mat[i])+k)
+            prob_neg_denom += (sum(train_mat[i]))
         else:
             prob_pos_num += train_mat[i]
-            prob_pos_denom += (sum(train_mat[i])+k)
+            prob_pos_denom += (sum(train_mat[i]))
     # prob vector for negative reviews P(fi|0)
-    prob_neg_vec = np.log((prob_neg_num+k)/(prob_neg_denom))
+    prob_neg_vec = np.log((prob_neg_num+k)/(prob_neg_denom+k))
     # prob vector for positive reviews P(fi|1)
-    prob_pos_vec = np.log((prob_pos_num+k)/(prob_pos_denom))
+    prob_pos_vec = np.log((prob_pos_num+k)/(prob_pos_denom+k))
 
     save_to_file(prob_neg_vec, prob_pos_vec, prior_sentiment, vocab)
 
@@ -117,7 +117,7 @@ def save_results_cv(fold_type, feat_type, results, performances, perf_average, v
     notes = "results obtained on " + str(datetime.datetime.now())
     f = open('./results/results_cv.txt', 'a+', encoding='utf-8')
     f.write("fold type: %s\nfeature: %s\t#performance: %s\taverage performance: %f\tvariance: %f\tnotes: %s\n" % (fold_type, feat_type, performances, perf_average, variance, notes))
-    f.write(str(results))
+    # f.write(str(results))
     f.write('\n')
     f.close()
 
@@ -175,11 +175,11 @@ def naive_bayes_classifier(feature_type, smoothing, cv_part=False, train_size_cv
     print("\nfinding the corpus for the classifier ...")
     # full vocabulary for the training reviews (frequency cutoff implemented)
     if feature_type == 'unigram':
-        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9)
+        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=8)
     elif feature_type == 'bigram':
-        full_vocab = feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+        full_vocab = feat.get_vocab_bigram(reviews_train, cutoff_threshold=13)
     else:
-        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9) + feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=8) + feat.get_vocab_bigram(reviews_train, cutoff_threshold=13)
     vocab_length = len(full_vocab)
     print("\n#features is ", vocab_length)
     

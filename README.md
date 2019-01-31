@@ -28,6 +28,7 @@ Two models in doc2vec:
 * distributed bag of words (PV-DBOW)
 
 Full table of doc2vec models pre-trained in the project:
+
 | index | algorithm | vector size | window size | negative samples | hierarchical softmax | epochs | accuracy |
 | -- | -- | -- | -- | -- | -- | -- | -- |
 | 1 | DM | 100 | 10 | NA | Y | 10/20 | 78.1% / 79.5% |
@@ -41,12 +42,30 @@ Full table of doc2vec models pre-trained in the project:
 | 9 | DBOW | 150 | NA | NA | Y | 10/20 | 86.3% / 86.3% |
 | 10 | DBOW | 150 | NA | 5 | NA | 10/20 | 87.3 % / __88.3%__ |
 
+Negative sampling was introduced as an alternative to the most complex hierarchical softmax step at the output layer in doc2vec model, with the authors (Mikolov et al., 2013) finding that not only it is more efficient, but actually produces better word vectors on average. The better performance of negative sampling could be seen from comparison between (1) and (2), (4) and (5), (7) and (8) in the above table.
+
 Concatenated Doc2Vec models
+
 | index | dm model id | dbow model id | accuracy |
 | -- | -- | -- | -- |
 | 1 | 15 | 18 | 84.1% |
 | 2 | 15 | 20 | 84.4% | 
 
+
+
+Monte Carlo Permutation Test
+
+|   | 1 | 2         | 3         | 4     | 5     | 6     | 7     | 8     | 9     |
+| -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | 
+| 1 | - | 1.0  | 0.7780  | 0.0002 | 0.0002 | 0.0002 | 0.0002 | 0.0002 | 0.0002 |
+| 2 | 1.0 | -  | 0.6839  | 0.0002 | 0.0002 | 0.0002 | 0.0002 | 0.0002 | 0.0002 |
+| 3 | 0.7703 | 0.6709 | -  |  0.0002 | 0.0002 | 0.0002 | 0.0002 | 0.0002 | 0.0002 |
+| 4 | 0.0002  | 0.0002  | 0.0002  | - | 0.4757 | 0.6863 | 0.8430 | 0.6810 | 0.9198 | 
+| 5 | 0.0002  | 0.0002  | 0.0002  | 0.4831 | - | 0.8412 | 0.6845 | 0.8352 | 0.6247 |
+| 6 | 0.0002  | 0.0002  | 0.0002  | 0.7040 | 0.8446 | - | 0.9210 | 1.0 | 0.8486 |
+| 7 | 0.0002  | 0.0002  | 0.0002  | 0.8384 | 0.6903 | 0.9162 | - | 0.9284 | 1.0 | 
+| 8 | 0.0002  | 0.0002  | 0.0002  | 0.6895 | 0.8454 | 1.0 | 0.9240 | - | 0.8340 |
+| 9 | 0.0002  | 0.0002  | 0.0002  | 0.9256 | 0.6449 | 0.8418 | 1.0 | 0.8447 | - |
 
 ### note 1
 According to Le & Mikolov 2014, PV-DM alone usually works well for most tasks (with state-of-art performance), but its combination with PV-DBOW is usually more consistent across many tasks that they tried and therefore strongly recommended.

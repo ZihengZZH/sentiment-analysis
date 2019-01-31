@@ -1,6 +1,7 @@
 import numpy as np
 import math
-from itertools import permutations
+import itertools
+import progressbar
 
 
 # return the combination value given N, i
@@ -50,25 +51,34 @@ def run_sign_test(result_A, result_B, feat_type):
     f.write("\nSign test:\t Plus: %d, Minus: %d, Null: %d" % (no_plus, no_minus, no_null))
     f.write("\nthe p-value for this sign test between two classifier using %s features: %f" % (feat_type, p_value))
     f.close()
-    print("\written to files ...")
+    print("\nwritten to files ...")
 
 
 # return the permutation list (0/1 at each position)
-def get_permutation_list(N):
+def get_permutation_list(N, R):
     # para N: number of pairs of samples
-    permu_list = set()
-    for i in range(N+1):
-        list_2_permu = [0]*i + [1]*(N - i)
-        for temp_list in permutations(list_2_permu):
-            permu_list.add(temp_list)
+    # para R: monte Carlo Permutation test
+    permu_list, count = set(), 0
+    limit = math.pow(2, N) / R
+
+    for permu in itertools.product(range(2), repeat=N):
+        count += 1
+        if count % limit != 0:
+            continue
+        elif len(permu_list) == R and R != 0:
+            break
+        else:
+            permu_list.add(permu)
+    
+    print(permu_list)
     return list(permu_list)
 
 
 # calculate the mean difference between two given list and a swap list
 def calc_mean_difference(list_A, list_B, swap_list):
-    # para list_A:
-    # para list_B:
-    # para swap_list: 
+    # para list_A: data A
+    # para list_B: data B
+    # para swap_list: whether two index swap between lists
     mean_diff_A, mean_diff_B = .0, .0
     length_n = len(list_A)
     assert len(list_A) == len(list_B), "ERROR! LENGTHS MISMATCH"
@@ -93,20 +103,56 @@ def run_permutation_test(result_A, result_B, R=0):
     p_value, no_larger = .0, 0
     assert len(result_A) == len(result_B), "ERROR! LENGTHS MISMATCH"
 
-    permutation_list = get_permutation_list(len(result_A))
+    print("\ncalculating the permutation list")
+    permutation_list = get_permutation_list(len(result_A), R)
+    print("\npermutation list length %d" % len(permutation_list))
     original_result = calc_mean_difference(result_A, result_B, [0]*len(result_A))
-
+    bar = progressbar.ProgressBar()
+    print("\ncalculating mean difference for every single permutation")
     if R == 0:
-        for i in range(len(permutation_list)):
+        for i in bar(range(len(permutation_list))):
             no_larger += calc_mean_difference(result_A, result_B, permutation_list[i]) >= original_result
         p_value = (no_larger + 1) / (len(permutation_list) + 1)
     else:
-        for j in range(R):
+        for j in bar(range(R)):
             np.random.shuffle(permutation_list)
             no_larger += calc_mean_difference(result_A, result_B, permutation_list[j]) >= original_result
         p_value = (no_larger + 1) / (R + 1)
-
+    print("\nDONE")
     return p_value, no_larger
+
+
+'''WONDERFUL IMPLEMENTATION'''
+def exact_mc_perm_test(xs, ys, nmc):
+    n, k = len(xs), 0
+    diff = np.abs(np.mean(xs) - np.mean(ys))
+    zs = np.concatenate([xs, ys])
+    bar = progressbar.ProgressBar()
+    for j in bar(range(nmc)):
+        np.random.shuffle(zs)
+        k += diff <= np.abs(np.mean(zs[:n]) - np.mean(zs[n:]))
+    return round(((k+1) / (nmc+1)), 5)
+
+
+def pairwise_permutation_test():
+    print("\nload the classification results")
+    results = np.load("./results/classification.npy")
+
+    from mlxtend.evaluate import permutation_test
+    import permutation_test as p
+    p_values = dict()
+
+    def get_p_values(p_values, index1, index2):
+        dict_name = "%d-%d" % (index1, index2)
+        # p_values[dict_name] = p.permutationtest(results[index1-1], results[index2-1], n_combinations_max=5000)
+        # p_values[dict_name] = permutation_test(results[index1-1], results[index2-1], func=lambda x, y: np.abs(np.mean(x) - np.mean(y)), method='approximate', num_rounds=5000, seed=0)
+        p_values[dict_name] = exact_mc_perm_test(results[index1-1], results[index2-1], 5000)
+    
+    for pair in itertools.product(range(1, 10), repeat=2):
+        if pair[0] != pair[1]:
+            get_p_values(p_values, pair[0], pair[1])
+
+    print(p_values)
 
 
 '''

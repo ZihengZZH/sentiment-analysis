@@ -34,6 +34,8 @@ SVM_PARA_BOW_GRID_PATH = './results/gridsearch_bow.txt'
 parameters = namedtuple("Parameters", "kernel C gamma")
 svm_para_dbow = parameters(2, 100, 0.001)
 svm_para_dm = parameters(2, 10, 0.0001)
+svm_para_unigram = parameters(0, 1, 0)
+svm_para_bigram = parameters(2, 10, 0.001)
 
 
 # prepare the train/text data for SVM classifier
@@ -78,15 +80,21 @@ def save_readme(if_doc2vec=False):
 
 
 # train the SVM-Light classifier 
-def train_svm_classifier(if_doc2vec, dbow):
+def train_svm_classifier(if_doc2vec, dbow, feature_type):
     # para if_doc2vec: bow features or doc2vec embeddings
     svm_path = SVM_DOC2VEC_PATH if if_doc2vec else SVM_BOW_PATH
     # check if files available
     assert os.path.isfile("./svm-light/svm_learn"), "SVM Light source code missing"
     assert os.path.isfile(svm_path + "train.dat"), "SVM training data missing"
-    (kernel, C, gamma) = (svm_para_dbow.kernel, svm_para_dbow.C, svm_para_dbow.gamma) if dbow else (svm_para_dm.kernel, svm_para_dm.C, svm_para_dm.gamma)
+    if if_doc2vec:
+        (kernel, C, gamma) = (svm_para_dbow.kernel, svm_para_dbow.C, svm_para_dbow.gamma) if dbow else (svm_para_dm.kernel, svm_para_dm.C, svm_para_dm.gamma)
+    else:
+        (kernel, C, gamma) = (svm_para_unigram.kernel, svm_para_unigram.C, svm_para_unigram.gamma) if feature_type == 'unigram' else (svm_para_bigram.kernel, svm_para_bigram.C, svm_para_bigram.gamma)
     # run the SVM-Light classifier
-    subprocess.run(["./svm-light/svm_learn", "-t", "%d" % kernel, "-c", "%f" % C, "-g", "%f" % gamma, "-m", "100", svm_path + "train.dat", svm_path + "model"])
+    if kernel == 0:
+        subprocess.run(["./svm-light/svm_learn", "-t", "%d" % kernel, "-c", "%f" % C, "-m", "100", svm_path + "train.dat", svm_path + "model"])
+    elif kernel == 2:
+        subprocess.run(["./svm-light/svm_learn", "-t", "%d" % kernel, "-c", "%f" % C, "-g", "%f" % gamma, "-m", "100", svm_path + "train.dat", svm_path + "model"])
     save_readme(if_doc2vec)
     
 
@@ -118,11 +126,11 @@ def SVM_classifier(feature_type, cv_part=False, if_doc2vec=False, model_no=1, co
         print("\nfinding the corpus for the classifier ...")
         # full vocabulary for the training reviews (frequency cutoff implemented)
         if feature_type == 'unigram':
-            full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9)
+            full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=8)
         elif feature_type == 'bigram':
-            full_vocab = feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+            full_vocab = feat.get_vocab_bigram(reviews_train, cutoff_threshold=13)
         else:
-            full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9) + feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+            full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=8) + feat.get_vocab_bigram(reviews_train, cutoff_threshold=13)
         vocab_length = len(full_vocab)
         print("\n#features is ", vocab_length)
 
@@ -174,7 +182,7 @@ def SVM_classifier(feature_type, cv_part=False, if_doc2vec=False, model_no=1, co
         dbow = None
     
     print("\ntrain the SVM-Light classifier ... \n")
-    train_svm_classifier(if_doc2vec, dbow)
+    train_svm_classifier(if_doc2vec, dbow, feature_type)
     print("\ntraining, DONE.")
     
     print("\ntest the SVM-Light classifier ... \n")
@@ -195,25 +203,37 @@ def SVM_classifier(feature_type, cv_part=False, if_doc2vec=False, model_no=1, co
                 misclassify += 1
             elif i > test_size and results[i] < 0:
                 misclassify += 1
-        return (len(results) - misclassify) / len(results)
+        # return (len(results) - misclassify) / len(results)
+        return results
     
     return read_predictions()
 
 
-def SVM_classifier_sklearn(model_no):
+def SVM_classifier_sklearn(model_no, train_size, test_size, reviews_train, reviews_test):
     # para model_no: which Doc2Vec model to use
-    train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
-    train_matrix, train_labels = doc2vec.infer_embedding(model_no, reviews_train, train_size, False)
-    test_matrix, test_labels = doc2vec.infer_embedding(model_no, reviews_test, test_size, False)
+    if_doc2vec = False
+    if if_doc2vec:
+        train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
+        train_matrix, train_labels = doc2vec.infer_embedding(model_no, reviews_train, train_size, False)
+        test_matrix, test_labels = doc2vec.infer_embedding(model_no, reviews_test, test_size, False)
+    else:
+        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=8)
+        print("\nfeature size: %d" % len(full_vocab))
+        train_matrix = feat.bag_words2vec_unigram(full_vocab, reviews_train)
+        test_matrix = feat.bag_words2vec_unigram(full_vocab, reviews_test)
+        train_labels = np.hstack((np.ones(train_size)*-1, np.ones(train_size)))
+        test_labels = np.hstack((np.ones(test_size)*-1, np.ones(test_size)))
+    
     X_train, y_train, X_test, y_test = train_matrix, train_labels, test_matrix, test_labels
-    print("\ntrain the sklearn SVM classifier (with doc2vec embeddings) ... \n")
-    svm_doc2vec = svm.SVC(kernel='rbf', C=10, degree=3, gamma='auto')
+    print("\ntrain the sklearn SVM classifier ... \n")
+    svm_doc2vec = svm.SVC(kernel='linear', C=10)
     svm_doc2vec.fit(X_train, y_train)
     print("\ntraining, DONE.")
-    print("\ntest the sklearn SVM classifier (with doc2vec embeddings) ... \n")
+    print("\ntest the sklearn SVM classifier ... \n")
     y_pred = svm_doc2vec.predict(X_test)
     print(metrics.classification_report(y_test, y_pred))
     print("Overall accuracy: ", round(metrics.accuracy_score(y_test, y_pred), 2))
+    return round(metrics.accuracy_score(y_test, y_pred), 2), y_pred
 
 
 def SVM_grid_search_doc2vec(model_no, concatenate):
@@ -244,13 +264,14 @@ def SVM_grid_search_doc2vec(model_no, concatenate):
 
 
 def SVM_grid_search_bow(feature_type):
+    # para feature_type: either unigram or bigram to use
     train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
     if feature_type == 'unigram':
-        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9)
+        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=8)
     elif feature_type == 'bigram':
-        full_vocab = feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+        full_vocab = feat.get_vocab_bigram(reviews_train, cutoff_threshold=13)
     else:
-        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=9) + feat.get_vocab_bigram(reviews_train, cutoff_threshold=14)
+        full_vocab = feat.get_vocab(reviews_train, cutoff_threshold=8) + feat.get_vocab_bigram(reviews_train, cutoff_threshold=13)
     vocab_length = len(full_vocab)
     print("\n#features is ", vocab_length)
 
@@ -281,10 +302,10 @@ def SVM_grid_search_bow(feature_type):
 
     print("\nrun the Grid Search for SVM classifier (with bow features) ... \n")
     tuned_parameters = [
-        {'kernel': ['rbf'], 'gamma': [1e-2, 1e-3, 1e-4], 'C': [1, 10, 100, 1000, 10000]},
-        {'kernel': ['linear'], 'C': [1, 10, 100, 1000, 10000]}
+        {'kernel': ['rbf'], 'gamma': [1e-1, 1e-2, 1e-3, 1e-4], 'C': [10, 100, 1000, 10000]},
+        {'kernel': ['linear'], 'C': [10, 100, 1000, 10000]}
         ]
-    clf = GridSearchCV(svm.SVC(), tuned_parameters, cv=3, n_jobs=12, verbose=10)
+    clf = GridSearchCV(svm.SVC(), tuned_parameters, cv=5, n_jobs=12, verbose=10)
     clf.fit(X_train, y_train)
     print("\ngrid search, DONE.")
     print("\ngrid search results are listed as follows.")

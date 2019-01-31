@@ -1,6 +1,7 @@
 import numpy as np
 import progressbar
 from scipy import stats
+from smart_open import smart_open
 from multiprocessing import cpu_count, Pool
 
 import src.text as text
@@ -10,6 +11,7 @@ import src.stats_test as st
 import src.nb_classify as nb
 import src.svm_classify as svm
 import src.doc2vec as doc2vec
+import src.utility as utility
 
 POS_TAGGING = False
 
@@ -93,20 +95,50 @@ def grid_search_svm_doc2vec(start_no, concatenate):
             svm.SVM_grid_search_doc2vec(i, False)
 
 
-if __name__ == "__main__":
-    # ten_fold_NB('consecutive', 'unigram')
-    # ten_fold_NB('consecutive', 'bigram')
-    # ten_fold_NB('consecutive', 'both')
+def examine_doc2vec_results(model_list):
+    train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
+    for model_no in model_list:
+        doc2vec.examine_results(model_no, reviews_train, train_size)
 
-    # ten_fold_SVM('consecutive', 'unigram')
-    # ten_fold_SVM('consecutive', 'bigram')
-    # ten_fold_SVM('consecutive', 'both')
 
-    # ten_fold_SVM('consecutive', '#', True, 15)
-    # ten_fold_SVM('consecutive', '#', True, 18)
-    # ten_fold_SVM('consecutive', '#', True, 20)
+def main():
+    ten_fold_NB('consecutive', 'unigram')
+    ten_fold_NB('consecutive', 'bigram')
+    ten_fold_NB('consecutive', 'both')
+
+    ten_fold_SVM('consecutive', 'unigram', False, 0)
+    ten_fold_SVM('consecutive', 'bigram', False, 0)
+    ten_fold_SVM('consecutive', 'both', False, 0)
+
+    ten_fold_SVM('consecutive', '#', True, 15)
+    ten_fold_SVM('consecutive', '#', True, 18)
+    ten_fold_SVM('consecutive', '#', True, 20)
 
     ten_fold_SVM('consecutive', '#', True, [15, 18])
     ten_fold_SVM('consecutive', '#', True, [15, 20])
 
-    # grid_search_svm_bow()
+
+def permutation_test():
+    results_nb_uni = nb.naive_bayes_classifier('unigram', 'laplace')
+    results_nb_bi = nb.naive_bayes_classifier('bigram', 'laplace')
+    results_nb_both = nb.naive_bayes_classifier('both', 'laplace')
+    result_svm_uni = svm.SVM_classifier('unigram')
+    result_svm_bi = svm.SVM_classifier('bigram')
+    result_svm_both = svm.SVM_classifier('both')
+    result_doc2vec_15 = svm.SVM_classifier('', if_doc2vec=True, model_no=15)
+    result_doc2vec_18 = svm.SVM_classifier('', if_doc2vec=True, model_no=18)
+    result_doc2vec_15_18 = svm.SVM_classifier('', if_doc2vec=True, model_no=[15,18], concatenate=True)
+    with smart_open('./results/permutation_test.txt', 'a+', enconding='utf-8') as f:
+        # f.write(str(result_doc2vec_15_18))
+        f.write('\n')
+
+
+def visualization_preparation():
+    train_size, test_size, reviews_train, reviews_test = cv.prepare_data()
+    doc2vec.process_metadata(15, reviews_train, reviews_test)
+    doc2vec.process_metadata(18, reviews_train, reviews_test)
+
+
+if __name__ == "__main__":
+    visualization_preparation()
+    
