@@ -242,19 +242,19 @@ def examine_results(model_no, reviews, reviews_size):
     # para model_no: which Doc2Vec to use
     # para reviews: test reviews to examine the results
     alldocs = load_IMDB_data()
-    sentiment_review = namedtuple('Sentiment_Review', 'words tags sentiment')
-    allreviews = []
-    bar = progressbar.ProgressBar()
-    for i in bar(range(len(reviews))):
-        tags = [i]
-        if i < reviews_size:
-            allreviews.append(sentiment_review(reviews[i], tags, 0.))
-        else:
-            allreviews.append(sentiment_review(reviews[i], tags, 1.))
+    # sentiment_review = namedtuple('Sentiment_Review', 'words tags sentiment')
+    # allreviews = []
+    # bar = progressbar.ProgressBar()
+    # for i in bar(range(len(reviews))):
+    #     tags = [i]
+    #     if i < reviews_size:
+    #         allreviews.append(sentiment_review(reviews[i], tags, 0.))
+    #     else:
+    #         allreviews.append(sentiment_review(reviews[i], tags, 1.))
     
     # load the model & generate the target doc id
     model = load_model(model_no)
-    doc_id = np.random.randint(0, len(allreviews))
+    doc_id = np.random.randint(0, len(alldocs))
 
     # save results to file
     with smart_open('./results/examine_doc2vec_%d.txt' % model_no, 'w', encoding='utf-8') as f:
@@ -264,15 +264,15 @@ def examine_results(model_no, reviews, reviews_size):
         f.write("for doc %d ..." % doc_id)
         f.write("\n")
         # infer document vector of the target
-        inferred_docvec = model.infer_vector(allreviews[doc_id].words)
+        inferred_docvec = model.infer_vector(alldocs[doc_id].words)
         print("%s:\n %s" % (model, model.docvecs.most_similar([inferred_docvec], topn=3)))
         f.write("%s:\n %s" % (model, model.docvecs.most_similar([inferred_docvec], topn=3)))
         f.write("\n")
 
         ''''DO CLOSE DOCUMENTS SEEM MORE RELATED THAN DISTANT ONES?'''
-        sims = model.docvecs.most_similar(doc_id, topn=len(allreviews)) # get all similar documents
-        print("Target (%d): <<%s>>\n" % (doc_id, ' '.join(allreviews[doc_id].words)))
-        f.write("Target (%d): <<%s>>\n" % (doc_id, ' '.join(allreviews[doc_id].words)))
+        sims = model.docvecs.most_similar(doc_id, topn=len(alldocs)) # get all similar documents
+        print("Target (%d): <<%s>>\n" % (doc_id, ' '.join(alldocs[doc_id].words)))
+        f.write("Target (%d): <<%s>>\n" % (doc_id, ' '.join(alldocs[doc_id].words)))
         f.write("\n")
         # output the most, median, least similar documents to the target
         for label, index in [('MOST', 0), ('MEDIAN', len(sims)//2), ('LEAST', len(sims) - 1)]:

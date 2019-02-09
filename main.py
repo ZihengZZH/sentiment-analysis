@@ -128,9 +128,9 @@ def permutation_test():
     result_doc2vec_15 = svm.SVM_classifier('', if_doc2vec=True, model_no=15)
     result_doc2vec_18 = svm.SVM_classifier('', if_doc2vec=True, model_no=18)
     result_doc2vec_15_18 = svm.SVM_classifier('', if_doc2vec=True, model_no=[15,18], concatenate=True)
-    with smart_open('./results/permutation_test.txt', 'a+', enconding='utf-8') as f:
+    # with smart_open('./results/permutation_test.txt', 'a+', enconding='utf-8') as f:
         # f.write(str(result_doc2vec_15_18))
-        f.write('\n')
+        # f.write('\n')
 
 
 def visualization_preparation():
@@ -140,5 +140,5 @@ def visualization_preparation():
 
 
 if __name__ == "__main__":
-    visualization_preparation()
-    
+    # visualization_preparation()
+    examine_doc2vec_results([15, 18])

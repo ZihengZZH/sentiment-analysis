@@ -1,8 +1,25 @@
 # sentiment-detection
 
+
+We investigate the use of document embeddings (```doc2vec```) in the sentiment classification problem, or more specifically, categorising movie reviews. Since there are a number of hyperparameters in ```doc2vec``` models, we evaluate every one of them and then the optimal hyperparameter setting. After tuning hyperparameters of Support Vector Machine (SVM) via a 10-fold cross-validation, we examine the performance of SVM classifier using ```doc2vec``` in comparison with the baseline system, a Naive Bayes (NB) classifier using Bag-Of-Words (BOW) features. We finally analyse the embedding space, which is learnt in ```doc2vec``` models, by visualizing similar subgroups of documents and inferring similar words given the target word. 
+
+We found that Support Vector Machine based classifiers using document embeddings (89.35\%) significantly outperform Naive Bayes classifier using traditional Bag-Of-Words representations (82.25\%).
+
 ## Naive Bayes
 
-## SVM
+The Naive Bayes (**NB**) classifier is based on the Bayes rule:
+
+$P(c|d) = \frac{P(c) P(d|c)}{P(d)}$
+
+Since NB assumes that every feature $f_i$ is conditionally independent given class $c$, the term $P(c|d)$ can be expressed as:
+
+$P_{NB}(c|d) := \frac{P(c)\prod_{i=1}^{m} P(f_i|c)^{n_i(d)}}{P(d)}$
+
+This is the foundation of NB classifiers and we apply unigrams and bigrams as the features, both of which are basically the bag-of-$n$-words model with different $n$ values. Pang et al. (2002) discussed the use of bigrams might undermine the conditional independence assumptions, and bigrams caused classification accuracy to decline by 5.8% in their experiement, and by 1.4% in our experiment.
+
+## Support Vector Machines
+
+Support Vector Machines (SVM) are considered as a universal learner to solve various kinds of Machine Learning problems, and with the introduction of Bag-Of-Words and the property of being robust on high feature dimensionality, SVM has been proved effective on text categorization tasks. More information could be referred to this [practical](https://github.com/ZihengZZH/machine_learning_practical/tree/master/prac_svm).
 
 ## Bag-Of-Words Model
 Early state-of-art document representations were based on the bag-of-words model, which represent input documents a fixed-length vector. Bag-of-words models are surprisingly effective but still lose information about word order. Bag of n-grams models consider word phrases of length n to represent documents as fixed-length vectors to capture local word order but suffer from data sparsity and high dimensionality.
@@ -53,7 +70,25 @@ Concatenated Doc2Vec models
 
 
 
-Monte Carlo Permutation Test
+## Comparison between NB classifier and SVM classifier
+
+| index | classifier | features | accuracy (%) | variance (*e-3) |
+| -- | -- | -- | -- | -- | 
+| (1) | NB | unigrams | 81.15 | .635 |
+| (2) | NB | bigrams | 80.85 | .675 |
+| (3) | NB | uni/bigrams | 82.25 | .771 |
+| (4) | SVM | unigrams | 83.40 | .544 | 
+| (5) | SVM | bigrams | 80.90 | *.509* |
+| (6) | SVM | uni/bigrams | *84.10* | .709 | 
+| (7) | SVM | DM | 83.25 | .476 | 
+| (8) | SVM | DBOW | **89.35** | **.345** | 
+| (9) | SVM | DM/DBOW | 84.15 | .394 |
+
+where (1) to (6) are the baseline system in our experiment. We can see that SVM using unigrams and bigrams achieve the best preformance in the baseline, and SVM using document embeddings DBOW achieve the overall best performance.
+
+![](https://github.com/ZihengZZH/sentiment-detection/blob/master/results/barchart.png)
+
+**Monte Carlo Permutation Test**
 
 |   | 1 | 2         | 3         | 4     | 5     | 6     | 7     | 8     | 9     |
 | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | 
@@ -66,6 +101,8 @@ Monte Carlo Permutation Test
 | 7 | 0.0002  | 0.0002  | 0.0002  | 0.8384 | 0.6903 | 0.9162 | - | 0.9284 | 1.0 | 
 | 8 | 0.0002  | 0.0002  | 0.0002  | 0.6895 | 0.8454 | 1.0 | 0.9240 | - | 0.8340 |
 | 9 | 0.0002  | 0.0002  | 0.0002  | 0.9256 | 0.6449 | 0.8418 | 1.0 | 0.8447 | - |
+
+We can see that SVM classifiers all significantly outperform NB classifiers.
 
 ### note 1
 According to Le & Mikolov 2014, PV-DM alone usually works well for most tasks (with state-of-art performance), but its combination with PV-DBOW is usually more consistent across many tasks that they tried and therefore strongly recommended.
