@@ -82,6 +82,7 @@ def grid_search_svm_bow():
     svm.SVM_grid_search_bow('bigram')
     svm.SVM_grid_search_bow('both')
 
+
 # Grid search for SVM classifier using doc2vec embeddings
 def grid_search_svm_doc2vec(start_no, concatenate):
     # para start_no:
@@ -93,6 +94,10 @@ def grid_search_svm_doc2vec(start_no, concatenate):
         for i in range(start_no, 21):
             print("\nmodel no: %d" % i)
             svm.SVM_grid_search_doc2vec(i, False)
+
+
+def train_doc2vec_models():
+    doc2vec.train_doc_embedding()
 
 
 def examine_doc2vec_results(model_list):
@@ -128,9 +133,6 @@ def permutation_test():
     result_doc2vec_15 = svm.SVM_classifier('', if_doc2vec=True, model_no=15)
     result_doc2vec_18 = svm.SVM_classifier('', if_doc2vec=True, model_no=18)
     result_doc2vec_15_18 = svm.SVM_classifier('', if_doc2vec=True, model_no=[15,18], concatenate=True)
-    # with smart_open('./results/permutation_test.txt', 'a+', enconding='utf-8') as f:
-        # f.write(str(result_doc2vec_15_18))
-        # f.write('\n')
 
 
 def visualization_preparation():
@@ -140,5 +142,9 @@ def visualization_preparation():
 
 
 if __name__ == "__main__":
-    # visualization_preparation()
-    examine_doc2vec_results([15, 18])
+    # initialize a timer
+    timer = utility.Timer()
+    timer.start()
+    # function to run
+    ten_fold_NB('consecutive', 'unigram')
+    timer.stop()

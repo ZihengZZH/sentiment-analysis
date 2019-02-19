@@ -76,3 +76,15 @@ feature: both	#feature: 19040	training size: 900	smooth: laplace	neg_accuracy: 0
 feature: unigram	#feature: 9482	training size: 900	smooth: laplace	neg_accuracy: 0.880000	pos_accuracy: 0.810000	classification_accuracy: 0.845000	notes: results obtained on 2019-01-31 02:42:28.930594
 feature: bigram	#feature: 9558	training size: 900	smooth: laplace	neg_accuracy: 0.830000	pos_accuracy: 0.850000	classification_accuracy: 0.840000	notes: results obtained on 2019-01-31 02:44:01.459652
 feature: both	#feature: 19040	training size: 900	smooth: laplace	neg_accuracy: 0.890000	pos_accuracy: 0.830000	classification_accuracy: 0.860000	notes: results obtained on 2019-01-31 02:47:41.052476
+
+'''TEST AFTER JSON'''
+feature: unigram	#feature: 9503	training size: 900	smooth: laplace	neg_accuracy: 0.880000	pos_accuracy: 0.800000	classification_accuracy: 0.840000	notes: results obtained on 2019-02-19 17:03:04.415155
+feature: unigram	#feature: 9524	training size: 900	smooth: laplace	neg_accuracy: 0.840000	pos_accuracy: 0.750000	classification_accuracy: 0.795000	notes: results obtained on 2019-02-19 17:03:31.514171
+feature: unigram	#feature: 9421	training size: 900	smooth: laplace	neg_accuracy: 0.810000	pos_accuracy: 0.790000	classification_accuracy: 0.800000	notes: results obtained on 2019-02-19 17:03:59.390008
+feature: unigram	#feature: 9441	training size: 900	smooth: laplace	neg_accuracy: 0.860000	pos_accuracy: 0.740000	classification_accuracy: 0.800000	notes: results obtained on 2019-02-19 17:04:27.813888
+feature: unigram	#feature: 9458	training size: 900	smooth: laplace	neg_accuracy: 0.880000	pos_accuracy: 0.820000	classification_accuracy: 0.850000	notes: results obtained on 2019-02-19 17:04:56.380613
+feature: unigram	#feature: 9495	training size: 900	smooth: laplace	neg_accuracy: 0.900000	pos_accuracy: 0.640000	classification_accuracy: 0.770000	notes: results obtained on 2019-02-19 17:05:24.266389
+feature: unigram	#feature: 9479	training size: 900	smooth: laplace	neg_accuracy: 0.850000	pos_accuracy: 0.870000	classification_accuracy: 0.860000	notes: results obtained on 2019-02-19 17:05:51.781665
+feature: unigram	#feature: 9482	training size: 900	smooth: laplace	neg_accuracy: 0.890000	pos_accuracy: 0.760000	classification_accuracy: 0.825000	notes: results obtained on 2019-02-19 17:06:20.271659
+feature: unigram	#feature: 9453	training size: 900	smooth: laplace	neg_accuracy: 0.950000	pos_accuracy: 0.750000	classification_accuracy: 0.850000	notes: results obtained on 2019-02-19 17:06:50.247712
+feature: unigram	#feature: 9491	training size: 900	smooth: laplace	neg_accuracy: 0.850000	pos_accuracy: 0.770000	classification_accuracy: 0.810000	notes: results obtained on 2019-02-19 17:07:20.315249

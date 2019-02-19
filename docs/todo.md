@@ -21,18 +21,18 @@
     * ~~training algorithm (dm, dbow)~~
     * ~~the size of the feature vectors (100 dimensions)~~
     * ~~number of iterations / epochs (10 or 20)~~
-    * context window (10 / 20)
-    * hierarchical softmax (faster version) (hs == 1)
+    * ~~context window (10 / 20)~~
+    * ~~hierarchical softmax (faster version) (hs == 1)~~
     * ~~save the model into different directories~~
 10. ~~use SVM-light classifier with doc2vec embeddings~~
     * SVM + doc2vec classifier accuracy == 88%
 11. investigate the hyper-parameters of SVM-Light
     * ~~what kind of SVM is SVM-Light? which kernel?~~
-    * How to tune the parameter? GridSearchCV -- very expensive computation
+    * ~~How to tune the parameter? GridSearchCV~~ -- very expensive computation
 12. cross validation (train/valid/test)
     * ~~alternative in sklearn applied~~
 13. ~~permutation test -- need to understand~~
-    * implement permutation test
+    * ~~implement permutation test~~
 14. ~~train the various doc2vec models using the IMDB movie review database~~
     * paragraph embeddings from original dataset refers to this model
 15. ~~concatenate doc2vec to infer document embeddings~~

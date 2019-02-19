@@ -5,6 +5,7 @@ import src.svm_classify as svm
 import src.bow_feat as feat
 import src.cv_partition as cv
 import src.text as text
+from collections import namedtuple
 
 '''
 unittest: The Python unit testing framework
@@ -32,16 +33,21 @@ class SVMTest(unittest.TestCase):
         test_matrix = feat.bag_words2vec_unigram(self.full_vocab, self.reviews_test)
         
         print("\nprepare the data for the SVM-Light classifier ...")
-        svm.prepare_data_svm(train_matrix, self.train_size)
-        svm.prepare_data_svm(test_matrix, self.test_size, test=True)
+        svm.prepare_data(train_matrix, self.train_size, False)
+        svm.prepare_data(test_matrix, self.test_size, False, test=True)
         print("\ndata preparation, DONE")
         pass
 
-    def test_svm_classifier(self):
-        svm.train_svm_classifier()
-        svm.test_svm_classifier()
-        pass
-        
+    def test_json_load(self):
+        parameters = namedtuple("Parameters", "kernel C gamma")
+        svm_para_dbow = parameters(2, 100, 0.001)
+        svm_para_dm = parameters(2, 10, 0.0001)
+        svm_para_unigram = parameters(0, 1, 0)
+        svm_para_bigram = parameters(2, 10, 0.001)
+        self.assertEqual(svm.svm_para_dbow, svm_para_dbow)
+        self.assertEqual(svm.svm_para_dm, svm_para_dm)
+        self.assertEqual(svm.svm_para_unigram, svm_para_unigram)
+        self.assertEqual(svm.svm_para_bigram, svm_para_bigram)
 
 if __name__ == "__main__":
     unittest.main()

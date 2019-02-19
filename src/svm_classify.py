@@ -1,10 +1,11 @@
-import numpy as np
 import os
 import math
+import json
 import datetime
 import subprocess
 import progressbar
 import statsmodels.api
+import numpy as np
 from scipy import stats
 from sklearn import svm
 from sklearn import metrics
@@ -27,15 +28,22 @@ svm_learn example1/train.dat example1/model
 svm_classify example1/test.dat example1/model example1/predictions
 '''
 
-SVM_BOW_PATH = './models/svm_models/bow_svm/'
-SVM_DOC2VEC_PATH = './models/svm_models/doc2vec_svm/'
-SVM_PARA_GRID_PATH = './results/gridsearch_doc2vec.txt'
-SVM_PARA_BOW_GRID_PATH = './results/gridsearch_bow.txt'
+config = json.load(open('./config.json', 'r'))
 parameters = namedtuple("Parameters", "kernel C gamma")
-svm_para_dbow = parameters(2, 100, 0.001)
-svm_para_dm = parameters(2, 10, 0.0001)
-svm_para_unigram = parameters(0, 1, 0)
-svm_para_bigram = parameters(2, 10, 0.001)
+
+temp_1 = config['svm_model']['svm_para_dbow']
+svm_para_dbow = parameters(temp_1[0], temp_1[1], temp_1[2])
+temp_2 = config['svm_model']['svm_para_dm']
+svm_para_dm = parameters(temp_2[0], temp_2[1], temp_2[2])
+temp_3 = config['svm_model']['svm_para_unigram']
+svm_para_unigram = parameters(temp_3[0], temp_3[1],temp_3[2])
+temp_4 = config['svm_model']['svm_para_bigram']
+svm_para_bigram = parameters(temp_4[0], temp_4[1],temp_4[2])
+
+SVM_BOW_PATH = config['svm_model']['svm_bow_path']
+SVM_DOC2VEC_PATH = config['svm_model']['svm_doc2vec_path']
+SVM_PARA_GRID_PATH = config['svm_model']['svm_para_grid_doc2vec_path']
+SVM_PARA_BOW_GRID_PATH = config['svm_model']['svm_para_grid_bow_path']
 
 
 # prepare the train/text data for SVM classifier

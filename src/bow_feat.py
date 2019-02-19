@@ -119,7 +119,7 @@ def bag_words2vec_bigram(vocab, input_texts):
     # bar = progressbar.ProgressBar()
     NUM_PROCESS = cpu_count() * 3
     pool = Pool(processes=NUM_PROCESS)
-   
+
     vec2mat = np.array(list(pool.map(partial(words2vec_bigram, vocab), input_texts)))
     
     return vec2mat

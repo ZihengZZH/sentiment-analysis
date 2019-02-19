@@ -1,0 +1,21 @@
+{
+    "doc2vec_model": {
+        "no_epoch": 20,
+        "size_vector": 150,
+        "context_window": 10,
+        "negative_sampling": 0,
+        "hierarchical_softmax": 1,
+        "path": "./models/doc2vec_models/",
+        "list_path": "./models/doc2vec_models/model_list.txt"
+    },
+    "svm_model": {
+        "svm_para_dbow": [2, 100, 0.001],
+        "svm_para_dm": [2, 10, 0.0001],
+        "svm_para_unigram": [0, 1, 0],
+        "svm_para_bigram": [2, 10, 0.001],
+        "svm_bow_path": "./models/svm_models/bow_svm/",
+        "svm_doc2vec_path": "./models/svm_models/doc2vec_svm/",
+        "svm_para_grid_bow_path": "./results/gridsearch_bow.txt",
+        "svm_para_grid_doc2vec_path": "./results/gridsearch_doc2vec.txt"
+    }
+}

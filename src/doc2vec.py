@@ -1,4 +1,5 @@
 import os
+import json
 import gensim
 import datetime
 import subprocess
@@ -19,16 +20,17 @@ from gensim.models import doc2vec
 from gensim.models.doc2vec import TaggedDocument
 from gensim.test.test_doc2vec import ConcatenatedDoc2Vec
 
-
+config = json.load(open('./config.json', 'r'))
 NO_CORE = multiprocessing.cpu_count() * 3
-NO_EPOCH = 20
-SIZE_VECTOR = 100
-CONTEXT_WINDOW = 10
-NEGATIVE = 0
-HIERARCHICAL_SOFTMAX = 1
 
-DOC2VEC_PATH = './models/doc2vec_models/'
-DOC2VEC_LIST_PATH = './models/doc2vec_models/model_list.txt'
+NO_EPOCH = config['doc2vec_model']['no_epoch']
+SIZE_VECTOR = config['doc2vec_model']['size_vector']
+CONTEXT_WINDOW = config['doc2vec_model']['context_window']
+NEGATIVE = config['doc2vec_model']['negative_sampling']
+HIERARCHICAL_SOFTMAX = config['doc2vec_model']['hierarchical_softmax']
+DOC2VEC_PATH = config['doc2vec_model']['path']
+DOC2VEC_PATH = "%s%sEPOCH/" % (DOC2VEC_PATH, NO_EPOCH)
+DOC2VEC_LIST_PATH = config['doc2vec_model']['list_path']
 
 
 # load the IMDB data to train doc2vec models
@@ -59,6 +61,9 @@ def save_model(model2save, model_name):
         model2save.save(save_dir + 'doc2vec.model')
         readme_notes = np.array(["This %s model is trained on %s" % (model_name, str(datetime.datetime.now()))])
         np.savetxt(save_dir + 'readme.txt', readme_notes, fmt="%s")
+        # add model names to the list for further load
+        with smart_open(DOC2VEC_LIST_PATH, 'a+') as f:
+            f.write(save_dir + 'doc2vec.model' + '\n')
     
 
 # load the doc2vec model
@@ -144,11 +149,11 @@ def train_doc_embedding(test=False):
 
         print("\nbuild the vocabulary of doc2vec model ...")
         model.build_vocab(alldocs)
-        print("%s vocabulay scanned & state initialized" % model)
+        print("%s vocabulary scanned & state initialized" % model)
 
         model_name = str(model)
 
-        print("\nbegin training the %s doc2vec model ..." % model_name)
+        print("\nbegin training the %s doc2vec model (with %d threads) ..." % (model_name, NO_CORE))
         model.train(doc_list, total_examples=len(doc_list), epochs=model.epochs)
         save_model(model, model_name)
         print("\ntraining DONE and model saved to file")
@@ -168,11 +173,11 @@ def train_doc_embedding(test=False):
         for model in model_list:
             print("\nbuild the vocabulary of doc2vec model ...")
             model.build_vocab(alldocs)
-            print("%s vocabulay scanned & state initialized" % model)
+            print("%s vocabulary scanned & state initialized" % model)
 
             model_name = str(model).replace('/', '-')
             
-            print("\nbegin training the %s doc2vec model ..." % model_name)
+            print("\nbegin training the %s doc2vec model (with %d threads) ..." % (model_name, NO_CORE))
             model.train(doc_list, total_examples=len(doc_list), epochs=model.epochs)
             save_model(model, model_name)
             print("\ntraining DONE and %s doc2vec model saved to file" % model_name)
