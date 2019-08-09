@@ -1,4 +1,10 @@
 {
+    "data_path": {
+        "neg": "./dataset/data/NEG",
+        "pos": "./dataset/data/POS",
+        "neg_tag": "./dataset/data-tagged/NEG",
+        "pos_tag": "./dataset/data-tagged/POS"
+    },
     "doc2vec_model": {
         "no_epoch": 20,
         "size_vector": 150,

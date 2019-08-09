@@ -165,9 +165,9 @@ Here we treat ties by adding 0.5 events to the positive and 0.5 events to the ne
 
 The sign test is quite straightforward:
     pre-select significance level alpha = .05 (5%) or .01 (1%)
-    calculate p-value ---> if p-value <= 0.05 (> 0.05)
-                      ---> reject null hypothesis 
-                      ---> significant difference found 
+    calculate p-value   ---> if p-value <= 0.05 (> 0.05)
+                        ---> reject null hypothesis 
+                        ---> significant difference found 
 
 NOTE that the p-value calculation in permutation test is as follows:
     p = (s+1) / (R+1) 

@@ -1,23 +1,22 @@
-import os
-import re
+import os, re, json
 import string
 import glob
-import requests
 import tarfile
-import sys
-import codecs
 from smart_open import smart_open
 
-
-path_data_neg = './dataset/data/NEG'
-path_data_pos = './dataset/data/POS'
-path_data_tag_neg = './dataset/data-tagged/NEG'
-path_data_tag_pos = './dataset/data-tagged/POS'
+config = json.load(open('./config.json', 'r'))
+path_data_neg = config['data_path']['neg']
+path_data_pos = config['data_path']['pos']
+path_data_neg_tag = config['data_path']['neg_tag']
+path_data_pos_tag = config['data_path']['pos_tag']
 
 punctuations = string.punctuation+'``'+'"'
 
 
-def read_data_from_file(sentiment):
+def load_data_from_file(sentiment):
+    """
+    Load data w/ POS tag given sentiment
+    """
     # para sentiment: whether the review is neg or pos
     # return para: a list of words along without their tags
     # return type: list(list(str))
@@ -37,11 +36,14 @@ def read_data_from_file(sentiment):
     return reviews
 
 
-def read_data_tag_from_file(sentiment):
+def load_data_tag_from_file(sentiment):
+    """
+    Load data w/ POS tag given sentiment
+    """
     # para sentiment: whether the review is neg or pos
     # return para: a list of words along with their tags
     # return type: list(list(tuple(str,str)))
-    path = path_data_tag_neg if sentiment == 'neg' else path_data_tag_pos
+    path = path_data_neg_tag if sentiment == 'neg' else path_data_pos_tag
     files = os.listdir(path)
     reviews_tags = []
     for file in files:
@@ -58,6 +60,8 @@ def read_data_tag_from_file(sentiment):
 
 
 def visual_data(reviews):
+    """Visualize review data by listing
+    """
     # para tags: a list of words 
     # just visualise tags for one document
     print("--"*20)
@@ -66,6 +70,8 @@ def visual_data(reviews):
 
 
 def visual_data_tag(tags):
+    """Visualize review data w/ POS tag by listing
+    """
     # para tags: a list of words along with their tags
     # just visualise tags for one document
     print("--"*20)
@@ -74,9 +80,11 @@ def visual_data_tag(tags):
         print(word.ljust(20), tag)
 
 
-'''ONLY EXECUTED ONCE'''
-# prepare the IMDB data (normalization and cleaning)
 def prepare_data_IMDB():
+    """
+    prepare the IMDB data (normalization and cleaning)
+    <ONLY EXECUTED ONCE>
+    """
     dirname = 'aclImdb'
     filename = './dataset/aclImdb_v1.tar.gz'
     all_lines = []

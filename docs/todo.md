@@ -56,6 +56,8 @@
     * start from know similar grouping of reviews, then look at their distance in Embedding space
     * similarity must be defined before you measure angles between embeddings
     * recommend https://projector.tensorflow.org
+19. Re-structure the project
+20. LSTM-RNN based models
 
 ## NOTES
 ---
