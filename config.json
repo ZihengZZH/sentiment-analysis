@@ -1,9 +1,19 @@
 {
-    "data_path": {
-        "neg": "./dataset/data/NEG",
-        "pos": "./dataset/data/POS",
-        "neg_tag": "./dataset/data-tagged/NEG",
-        "pos_tag": "./dataset/data-tagged/POS"
+    "data_path": "/media/zzh/Ziheng-700G/Dataset/sentiment-analysis",
+    "dataset": {
+        "cam_neg": "reviewCamNLP/data/NEG",
+        "cam_pos": "reviewCamNLP/data/POS",
+        "cam_neg_tag": "reviewCamNLP/data-tagged/NEG",
+        "cam_pos_tag": "reviewCamNLP/data-tagged/POS",
+        "cam_data": "reviewCamNLP/alldata.csv",
+        "IMDB": "aclImdb/alldata-id.txt",
+        "twitter": "twitterSentiment/twitter_sentiment.csv",
+        "douban": "doubanSentiment/douban_sentiment.csv"
+    },
+    "embedding": {
+        "word2vec_zh": "",
+        "doc2vec_zh": "",
+        "doc2vec_en": ""
     },
     "doc2vec_model": {
         "no_epoch": 20,

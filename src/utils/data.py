@@ -2,13 +2,21 @@ import os, re, json
 import string
 import glob
 import tarfile
+import numpy as np
+import pandas as pd
 from smart_open import smart_open
 
+
 config = json.load(open('./config.json', 'r'))
-path_data_neg = config['data_path']['neg']
-path_data_pos = config['data_path']['pos']
-path_data_neg_tag = config['data_path']['neg_tag']
-path_data_pos_tag = config['data_path']['pos_tag']
+data_path = config['data_path']
+path_data_neg = os.path.join(data_path, config['dataset']['cam_neg'])
+path_data_pos = os.path.join(data_path, config['dataset']['cam_pos'])
+path_data_neg_tag = os.path.join(data_path, config['dataset']['cam_neg_tag'])
+path_data_pos_tag = os.path.join(data_path, config['dataset']['cam_pos_tag'])
+path_data_cam = os.path.join(data_path, config['dataset']['cam_data'])
+path_IMDB = os.path.join(data_path, config['dataset']['IMDB'])
+path_twitter = os.path.join(data_path, config['dataset']['twitter'])
+path_douban = os.path.join(data_path, config['dataset']['douban'])
 
 punctuations = string.punctuation+'``'+'"'
 
@@ -16,68 +24,58 @@ punctuations = string.punctuation+'``'+'"'
 def load_data_from_file(sentiment):
     """
     Load data w/ POS tag given sentiment
-    """
+    --
     # para sentiment: whether the review is neg or pos
-    # return para: a list of words along without their tags
-    # return type: list(list(str))
+    # return type: list(str)
+    """
     path = path_data_neg if sentiment == 'neg' else path_data_pos
     files = os.listdir(path)
     reviews = []
     for file in files:
         if not os.path.isdir(file):
-            f = open(path+'/'+file, 'r', encoding='utf-8')
-            review = list()
+            f = open(os.path.join(path, file), 'r', encoding='utf-8')
+            review = ""
             for line in f:
-                for word in re.split('\W+', line):
-                    if word != '':
-                        review.append(word.lower())
+                review += line.lower().replace('\n', '')
             reviews.append(review)
-            f.close()
+            f.close()  # otherwise resource warning
     return reviews
 
 
 def load_data_tag_from_file(sentiment):
     """
     Load data w/ POS tag given sentiment
-    """
+    --
     # para sentiment: whether the review is neg or pos
-    # return para: a list of words along with their tags
-    # return type: list(list(tuple(str,str)))
+    # return type: list(dict(str, str))
+    """
     path = path_data_neg_tag if sentiment == 'neg' else path_data_pos_tag
     files = os.listdir(path)
     reviews_tags = []
     for file in files:
         if not os.path.isdir(file):
-            f = open(path+'/'+file, 'r', encoding='utf-8')
-            review_tag = list()
+            f = open(os.path.join(path, file), 'r', encoding='utf-8')
+            review_tag = dict()
             for line in f:
                 word_tag = re.split(r'\t+', line[:-1])
                 if len(word_tag) == 2 and word_tag[0] not in punctuations:
-                    review_tag.append((word_tag[0].lower(),word_tag[1]))
+                    review_tag[word_tag[0].lower()] = word_tag[1]
             reviews_tags.append(review_tag)
             f.close()  # otherwise resource warning
     return reviews_tags
 
 
-def visual_data(reviews):
-    """Visualize review data by listing
+def prepare_data_camNLP():
     """
-    # para tags: a list of words 
-    # just visualise tags for one document
-    print("--"*20)
-    for word in reviews[0]:
-        print(word)
-
-
-def visual_data_tag(tags):
-    """Visualize review data w/ POS tag by listing
+    prepare the Movie Review data (camNLP)
+    <ONLY EXECUTED ONCE>
     """
-    # para tags: a list of words along with their tags
-    # just visualise tags for one document
-    print("--"*20)
-    print("word \t\t count")
-    for (word, tag) in tags[0]:
-        print(word.ljust(20), tag)
+    review_neg = load_data_from_file('neg')
+    review_pos = load_data_from_file('pos')
+    review_neg_label = np.stack((np.arange(len(review_neg)), np.array(review_neg), np.zeros(len(review_neg))), axis=-1)
+    review_pos_label = np.stack((np.arange(len(review_neg)), np.array(review_pos), np.ones(len(review_pos))), axis=-1)    
+    reviews = np.vstack((review_neg_label, review_pos_label))
+    pd.DataFrame(reviews, columns=['index', 'review', 'sentiment']).to_csv(path_data_cam)
 
 
 def prepare_data_IMDB():
@@ -85,8 +83,8 @@ def prepare_data_IMDB():
     prepare the IMDB data (normalization and cleaning)
     <ONLY EXECUTED ONCE>
     """
-    dirname = 'aclImdb'
-    filename = './dataset/aclImdb_v1.tar.gz'
+    dirname = os.path.join(data_path, 'aclImdb')
+    filename = os.path.join(data_path, 'aclImdb_v1.tar.gz')
     all_lines = []
     control_chars = [chr(0x85)] # Py3
 
@@ -99,7 +97,7 @@ def prepare_data_IMDB():
         norm_text = re.sub(r"([\.\",\(\)!\?;:])", " \\1", norm_text)
         return norm_text
 
-    if not os.path.isfile("./dataset/aclImdb/alldata-id.txt"):
+    if not os.path.isfile(path_IMDB):
         if not os.path.isdir(dirname):
             tar = tarfile.open(filename, mode='r')
             tar.extractall()
@@ -117,7 +115,7 @@ def prepare_data_IMDB():
             txt_files = glob.glob(os.path.join(dirname, fol, '*.txt'))
             print(" %s: %i file" % (fol, len(txt_files)))
             with smart_open(os.path.join(dirname, output), "wb") as n:
-                for i, txt in enumerate(txt_files):
+                for _, txt in enumerate(txt_files):
                     with smart_open(txt, "rb") as t:
                         one_text = t.read().decode("utf-8")
                         for c in control_chars:
@@ -133,5 +131,5 @@ def prepare_data_IMDB():
                 num_line = u"_*{0} {1}\n".format(idx, line)
                 f.write(num_line.encode("utf-8"))
     
-    assert os.path.isfile("./dataset/aclImdb/alldata-id.txt"), "alldata-id.txt unavailable"
+    assert os.path.isfile(path_IMDB), "alldata-id.txt unavailable"
     print("--SUCCESS--")

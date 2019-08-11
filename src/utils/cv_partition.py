@@ -1,8 +1,7 @@
-import numpy as np
-from data import *
-import progressbar
 import math
 import random
+import numpy as np
+from src.utils.data import *
 
 
 def n_fold_cons(no_fold, length_data):
@@ -58,11 +57,11 @@ def prepare_data(tags=False, gridsearch=False):
     (read all neg and pos reviews)
     """
     if not tags:
-        neg_reviews = read_data_from_file('neg')
-        pos_reviews = read_data_from_file('pos')
+        neg_reviews = load_data_from_file('neg')
+        pos_reviews = load_data_from_file('pos')
     else:
-        neg_reviews = read_data_tag_from_file('neg')
-        pos_reviews = read_data_tag_from_file('pos')
+        neg_reviews = load_data_tag_from_file('neg')
+        pos_reviews = load_data_tag_from_file('pos')
 
     if not gridsearch:
         print("\ntrain/test partitioning ...")

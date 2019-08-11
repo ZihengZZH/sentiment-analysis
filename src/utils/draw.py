@@ -2,7 +2,7 @@ import numpy as np
 import plotly.plotly as py
 import plotly.graph_objs as go
 
-from src.stats_test import run_permutation_test
+from src.utils.stats_test import run_permutation_test
 
 
 
