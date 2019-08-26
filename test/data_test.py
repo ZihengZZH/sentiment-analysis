@@ -1,39 +1,17 @@
 import unittest
-from src.utils.data import load_data_from_file
-from src.utils.data import load_data_tag_from_file
+from src.utils.data import load_data
 
-'''
-unittest: The Python unit testing framework
-unittest supports test automation, sharing of setup and shutdown code for tests, aggregation of tests into collections, and independence of the tests from the reporting framework.
-to run the unittest, python -m unittest test.text_test
-'''
 
 class TextReadTest(unittest.TestCase):
-    # method called to prepare the test fixture
-    def setUp(self):
-        self.number_reviews = 1000
-
-    # method called immediately after the test method has been called and the result recorded
-    def tearDown(self):
-        pass
-
-    def test_read_data_from_file(self):
-        reviews_neg = load_data_from_file('neg')
-        reviews_pos = load_data_from_file('pos')
-        assert len(reviews_neg) == self.number_reviews
-        assert len(reviews_pos) == self.number_reviews
-
-    def test_read_data_tag_from_file(self):
-        tags_neg = load_data_tag_from_file('neg')
-        tags_pos = load_data_tag_from_file('pos')
-        assert isinstance(tags_neg[0], dict)
-        assert isinstance(tags_pos[0], dict)
-        assert len(tags_neg) == self.number_reviews
-        assert len(tags_pos) == self.number_reviews
-
+    def test_load_data(self):
+        load_data('cam_data')
+        load_data('imdb_data')
+        load_data('twitter')
+        load_data('douban')
 
 if __name__ == "__main__":
     unittest.main()
+
 
 '''
 The .tag file is formatted with the Penn Treebank tagset

@@ -57,6 +57,16 @@
     * similarity must be defined before you measure angles between embeddings
     * recommend https://projector.tensorflow.org
 19. Re-structure the project
+    1.  classifiers
+        1.  NB
+        2.  SVM
+        3.  RF
+    2.  embeddimgs
+        1.  BOW
+        2.  WORD2VEC
+        3.  DOC2VEC
+        4.  LSTM
+    3. dataset 
 20. LSTM-RNN based models
 
 ## NOTES

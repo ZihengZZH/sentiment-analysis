@@ -109,7 +109,6 @@ venv.bak/
 *.csv
 *.txt
 /.vscode
-/models
 /svm-light
 /log
 /notebooks

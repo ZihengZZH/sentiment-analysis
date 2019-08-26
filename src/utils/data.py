@@ -1,10 +1,14 @@
-import os, re, json
+import os
+import re
+import json
 import string
 import glob
 import tarfile
 import numpy as np
 import pandas as pd
 from smart_open import smart_open
+from sklearn.model_selection import train_test_split
+from src.utils.display import print_new
 
 
 config = json.load(open('./config.json', 'r'))
@@ -15,15 +19,32 @@ path_data_neg_tag = os.path.join(data_path, config['dataset']['cam_neg_tag'])
 path_data_pos_tag = os.path.join(data_path, config['dataset']['cam_pos_tag'])
 path_data_cam = os.path.join(data_path, config['dataset']['cam_data'])
 path_IMDB = os.path.join(data_path, config['dataset']['IMDB'])
+path_data_imdb = os.path.join(data_path, config['dataset']['imdb_data'])
 path_twitter = os.path.join(data_path, config['dataset']['twitter'])
 path_douban = os.path.join(data_path, config['dataset']['douban'])
 
-punctuations = string.punctuation+'``'+'"'
+punctuations = string.punctuation + '``' + '"'
+
+
+def load_data(name):
+    """load data from specified dataset
+    --
+    # para name: dataset name
+    """
+    if name not in ['cam_data', 'imdb_data', 'twitter', 'douban']:
+        raise ValueError("DATASET NOT VALID")
+    
+    label = config['dataset']['%s_label' % name]
+    data = pd.read_csv(os.path.join(data_path, config['dataset'][name]))
+    X = data[label[0]].to_numpy()
+    y = data[label[1]].to_numpy()
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    return X_train, y_train, X_test, y_test
 
 
 def load_data_from_file(sentiment):
     """
-    Load data w/ POS tag given sentiment
+    Load data w/ POS tag given sentiment (camNLP)
     --
     # para sentiment: whether the review is neg or pos
     # return type: list(str)
@@ -44,7 +65,7 @@ def load_data_from_file(sentiment):
 
 def load_data_tag_from_file(sentiment):
     """
-    Load data w/ POS tag given sentiment
+    Load data w/ POS tag given sentiment (camNLP)
     --
     # para sentiment: whether the review is neg or pos
     # return type: list(dict(str, str))
@@ -133,3 +154,12 @@ def prepare_data_IMDB():
     
     assert os.path.isfile(path_IMDB), "alldata-id.txt unavailable"
     print("--SUCCESS--")
+
+
+def save_classifier_results(result_dict):
+    """dump classification results to json file
+    """
+    name = result_dict['classifier_name']
+    filename = data_path['results'][name]
+    with open(filename, 'a+') as json_file:
+        json.dump(result_dict, json_file)

@@ -1,17 +1,16 @@
 import numpy as np
-import progressbar
 from scipy import stats
 from smart_open import smart_open
 from multiprocessing import cpu_count, Pool
 
-import src.text as text
-import src.bow_feat as feat
-import src.cv_partition as cv
-import src.stats_test as st
-import src.nb_classify as nb
-import src.svm_classify as svm
-import src.doc2vec as doc2vec
-import src.utility as utility
+from src.utils import data
+from src.utils import bow_feat
+from src.utils import stats_test
+from src.classifier import nb_classify
+from src.classifier import svm_classify
+from src.embeddings import word2vec
+from src.embeddings import doc2vec
+from src.embeddings import lstm
 
 POS_TAGGING = False
 

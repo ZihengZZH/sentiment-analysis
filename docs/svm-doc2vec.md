@@ -1,5 +1,5 @@
 
-> A literally project work at Cambridge
+> Literally a piece of coursework at Cambridge
 
 We investigate the use of document embeddings (```doc2vec```) in the sentiment classification problem, or more specifically, categorising movie reviews. Since there are a number of hyperparameters in ```doc2vec``` models, we evaluate every one of them and then the optimal hyperparameter setting. After tuning hyperparameters of Support Vector Machine (SVM) via a 10-fold cross-validation, we examine the performance of SVM classifier using ```doc2vec``` in comparison with the baseline system, a Naive Bayes (NB) classifier using Bag-Of-Words (BOW) features. We finally analyse the embedding space, which is learnt in ```doc2vec``` models, by visualizing similar subgroups of documents and inferring similar words given the target word. 
 
@@ -29,7 +29,7 @@ Support Vector Machines (SVM) are considered as a universal learner to solve var
 Early state-of-art document representations were based on the bag-of-words model, which represent input documents a fixed-length vector. Bag-of-words models are surprisingly effective but still lose information about word order. Bag of n-grams models consider word phrases of length n to represent documents as fixed-length vectors to capture local word order but suffer from data sparsity and high dimensionality.
 
 ## word2vec
-learning neural word embeddings (Mikolov et al., 2013)
+> learning neural word embeddings (Mikolov et al., 2013)
 
 word2vec is a more recent model that embeds words in a lower-dimensional vector space using a shallow neural network. The result is a set of word-vectors where vectors close together in vector space have similar meanings based on context, and word-vectors distant to each other have differing meanings. 
 
@@ -38,7 +38,7 @@ Two models in word2vec:
 * continuouts-bag-of-words model
 
 ## doc2vec
-embeddings for sequences of words (Le and Mikolov, 2014)
+> embeddings for sequences of words (Le and Mikolov, 2014)
 
 doc2vec acts as if a document has another floating word-like vector, which contributes to all training predictions, and is updated like other word-vectors, but we will call it a doc-vector.
 

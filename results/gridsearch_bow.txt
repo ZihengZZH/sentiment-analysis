@@ -1,5 +1,0 @@
-unigram	{'C': 1, 'kernel': 'linear'}	0.8066666666666666
-bigram	{'C': 10, 'gamma': 0.001, 'kernel': 'rbf'}	0.7911111111111111
-unigram	{'C': 10, 'kernel': 'linear'}	0.8272222222222222
-bigram	{'C': 10, 'gamma': 0.001, 'kernel': 'rbf'}	0.7966666666666666
-both    {'C': 100, 'kernel': 'linear'}

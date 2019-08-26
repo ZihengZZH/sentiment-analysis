@@ -4,16 +4,19 @@ import itertools
 import progressbar
 
 
-# return the combination value given N, i
 def get_combination(upper, lower):
+    """return the combination value given N, i
+    """
     return math.factorial(upper)/(math.factorial(lower)*math.factorial(upper-lower))
 
 
-# calculate p-value for one specific pair of classifiers
 def get_p_value(plus, minus, null, ignore_ties=False):
+    """calculate p-value for one specific pair of classifiers
+    --
     # para plus: #Plus
     # para minus: #Minus
     # para null: #Null
+    """
     N, k = .0, .0
     q = .5
     p_val = .0
@@ -32,10 +35,12 @@ def get_p_value(plus, minus, null, ignore_ties=False):
     return p_val*2
 
 
-# run the sign test given two lists of results 
 def run_sign_test(result_A, result_B, feat_type):
+    """run the sign test given two lists of results
+    --
     # para result_A: classification result of system A (without smoothing)
     # para result_B: classification result of system B (with smoothing)
+    """
     no_plus, no_minus, no_null = 0, 0, 0
     print("running sign testing ...")
     for i in range(len(result_A)):
@@ -54,10 +59,12 @@ def run_sign_test(result_A, result_B, feat_type):
     print("\nwritten to files ...")
 
 
-# return the permutation list (0/1 at each position)
 def get_permutation_list(N, R):
+    """return the permutation list (0/1 at each position)
+    --
     # para N: number of pairs of samples
     # para R: monte Carlo Permutation test
+    """
     permu_list, count = set(), 0
     limit = math.pow(2, N) / R
 
@@ -74,11 +81,13 @@ def get_permutation_list(N, R):
     return list(permu_list)
 
 
-# calculate the mean difference between two given list and a swap list
 def calc_mean_difference(list_A, list_B, swap_list):
+    """calculate the mean difference between two given list and a swap list
+    --
     # para list_A: data A
     # para list_B: data B
     # para swap_list: whether two index swap between lists
+    """
     mean_diff_A, mean_diff_B = .0, .0
     length_n = len(list_A)
     assert len(list_A) == len(list_B), "ERROR! LENGTHS MISMATCH"
@@ -94,12 +103,14 @@ def calc_mean_difference(list_A, list_B, swap_list):
     return abs(round((mean_diff_B - mean_diff_A), 4))
 
 
-# run Monte Carlo Permutation test
 def run_permutation_test(result_A, result_B, R=0):
+    """run Monte Carlo Permutation test
+    --
     # para result_A: np.array
     # para result_B: np.array
     # para R: preset number of permuted samples
     # para R: if R != 0, called Monte Carlo Permutation test
+    """
     p_value, no_larger = .0, 0
     assert len(result_A) == len(result_B), "ERROR! LENGTHS MISMATCH"
 
@@ -135,6 +146,8 @@ def exact_mc_perm_test(xs, ys, nmc):
 
 
 def pairwise_permutation_test():
+    """run pairwise permutation test with mlxtend lib
+    """
     print("\nload the classification results")
     results = np.load("./results/classification.npy")
 
