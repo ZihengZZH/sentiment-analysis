@@ -17,8 +17,9 @@ class NBClassifier(object):
     --
     # para embedding: bow / word2vec / doc2vec / lstm
     # para smoothing: laplace / None
+    # para test: whether or not to test
     """
-    def __init__(self, embedding, smoothing):
+    def __init__(self, embedding, smoothing, test=False):
         print_new("Naive Bayes Classifier on sentiment analysis")
         self.name = 'nb_%s' % embedding
         self.X_train = None
@@ -35,8 +36,11 @@ class NBClassifier(object):
         self.accuracy = None
         self.recall = None
         self.f1_score = None
-        self.config = json.load(open('./config.json', 'r'))['nb_classifier']
-        self.save_path = os.path.join(self.config['save_path'], self.name)
+        self.config = json.load(open('./config.json', 'r'))
+        self.save_path = os.path.join(self.config['data_path'],
+                                    self.config['nb_classifier']['save_path'], 
+                                    self.name)
+        self.config = self.config['nb_classifier']
         if not os.path.isdir(self.save_path):
             os.mkdir(self.save_path)
     
@@ -64,8 +68,8 @@ class NBClassifier(object):
         # type test_mat: np.array()
         # type vocab: dict()
         """
-        assert isinstance(train_mat, np.array()), "train data format error"
-        assert isinstance(test_mat, np.array()), "test data format error"
+        assert isinstance(train_mat, np.ndarray), "train data format error"
+        assert isinstance(test_mat, np.ndarray), "test data format error"
         self.X_train = train_mat
         self.y_train = train_label
         self.X_test = test_mat
@@ -76,8 +80,10 @@ class NBClassifier(object):
     def train_model(self):
         """train self-implemented NB classifier
         """
-        if not self.X_train or not self.y_train or \
-        not self.X_test or not self.y_test:
+        if not self.X_train.any() or \
+            not self.y_train.any() or \
+            not self.X_test.any() or \
+            not self.y_test.any():
             print_new("TRAINING CANNOT PROCEED")
         
         print_new("training self-implemented NB classifier")
@@ -110,8 +116,10 @@ class NBClassifier(object):
     def evaluate_model(self):
         """evaluate self-implemented NB classifier
         """
-        if not self.X_train or not self.y_train or \
-        not self.X_test or not self.y_test:
+        if not self.X_train.any() or \
+            not self.y_train.any() or \
+            not self.X_test.any() or \
+            not self.y_test.any():
             print_new("EVALUATION CANNOT PROCEED")
         
         print_new("evaluating self-implemented NB classifier")
@@ -125,8 +133,8 @@ class NBClassifier(object):
         
         print(classification_report(self.y_test, y_pred))
         self.accuracy = accuracy_score(self.y_test, y_pred)
-        self.recall = recall_score(self.y_test, y_pred)
-        self.f1_score = f1_score(self.y_test, y_pred)
+        self.recall = recall_score(self.y_test, y_pred, average='macro')
+        self.f1_score = f1_score(self.y_test, y_pred, average='macro')
     
     def train_model_sklearn(self):
         """train sklearn NB classifier

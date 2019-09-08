@@ -3,6 +3,6 @@ def print_new(content):
     --
     # para content: display content
     """
-    print("--"*20)
+    print("---"*20)
     print(content)
-    print("--"*20)
+    print("---"*20)

@@ -38,6 +38,9 @@ def load_data(name):
     data = pd.read_csv(os.path.join(data_path, config['dataset'][name]))
     X = data[label[0]].to_numpy()
     y = data[label[1]].to_numpy()
+    if name == 'twitter':
+        for i in range(len(y)):
+            y[i] = ['Negative', 'Neutral', 'Positive'].index(y[i]) * 0.5
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     return X_train, y_train, X_test, y_test
 

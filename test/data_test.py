@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
 '''
 The .tag file is formatted with the Penn Treebank tagset
-CC      Coordinating conjuction
+CC      Coordinating conjunction
 CD      Cardinal number
 DT      Determiner
 EX      Existential there

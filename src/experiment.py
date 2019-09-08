@@ -4,7 +4,7 @@ from smart_open import smart_open
 from multiprocessing import cpu_count, Pool
 
 from src.utils import data
-from src.utils import bow_feat
+from src.utils import bow
 from src.utils import stats_test
 from src.classifier import nb_classify
 from src.classifier import svm_classify
