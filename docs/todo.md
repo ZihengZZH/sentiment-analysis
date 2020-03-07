@@ -66,8 +66,11 @@
         2.  WORD2VEC
         3.  DOC2VEC
         4.  LSTM
-    3. dataset 
+    3. dataset / data loader
 20. LSTM-RNN based models
+21. Tencent_AILab_ChineseEmbedding
+    1.  embeddings / feeding into classifier
+    2.  embeddings / feature eng / feeding into classifier
 
 ## NOTES
 ---

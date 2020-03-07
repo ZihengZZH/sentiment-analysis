@@ -1,13 +1,15 @@
 import unittest
-from src.utils.data import load_data
+from src.utils.data import dataLoader
 
 
-class TextReadTest(unittest.TestCase):
+class dataLoaderTest(unittest.TestCase):
     def test_load_data(self):
-        load_data('cam_data')
-        load_data('imdb_data')
-        load_data('twitter')
-        load_data('douban')
+        loader = dataLoader()
+        loader.load_data('cam_data')
+        loader.load_data('imdb_data')
+        loader.load_data('twitter')
+        loader.load_data('douban')
+
 
 if __name__ == "__main__":
     unittest.main()

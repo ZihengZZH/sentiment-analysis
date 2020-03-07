@@ -7,10 +7,6 @@ from functools import partial
 from src.utils.display import print_new
 
 
-config = json.load(open('./config.json', 'r'))
-data_path = config['data_path']
-
-
 def get_class_vec(sentiment, length):
     """return the vector of labels (neg/0 or pos/1)
     """
@@ -195,18 +191,21 @@ class BagOfWords(object):
     # para data_path: data location
     """
     def __init__(self, ngram, docs_train, docs_test, dataset):
+        self.config = json.load(open('./config.json', 'r', encoding='utf-8'))
         self.ngram = ngram
         self.docs_train = docs_train
         self.docs_test = docs_test
-        self.data_path = os.path.join(data_path, config['dataset'][dataset])
+        self.data_path = os.path.join(self.config['data_path'], 
+                                    self.config['dataset'][dataset])
         self.vocab = None
         self.X_train = None
         self.X_test = None
-        self.config = json.load(open('./config.json', 'r'))
         self.unigram_cutoff = self.config['bow']['unigram_cutoff']
         self.bigram_cutoff = self.config['bow']['bigram_cutoff']
     
     def save_bow(self):
+        """save bag-of-words representations to external files
+        """
         # get unigrams
         if self.ngram == 'unigram':
             self.vocab = get_vocab_unigram(self.docs_train, cutoff_threshold=self.unigram_cutoff)
@@ -233,6 +232,8 @@ class BagOfWords(object):
         np.save(os.path.join(self.data_path, 'X_test_bow'), self.X_test)
 
     def load_bow(self):
+        """load bag-of-words representations from external files
+        """
         try:
             self.vocab = np.load(os.path.join(self.data_path, 'vocabulary.npy'))
             self.X_train = np.load(os.path.join(self.data_path, 'X_train_bow.npy'))
@@ -241,6 +242,8 @@ class BagOfWords(object):
             print_new("NO BOW FEATURES AVAILABLE")
 
     def visualize(self):
+        """perform some visualization
+        """
         if self.ngram == 'unigram':
             visual_matrix_unigram(self.vocab, self.X_train)
         elif self.ngram == 'bigram':

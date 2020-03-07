@@ -1,18 +1,18 @@
 {
     "data_path": "/media/zzh/Ziheng-700G/Dataset/sentiment-analysis",
     "dataset": {
-        "cam_neg": "reviewCamNLP/data/NEG",
-        "cam_pos": "reviewCamNLP/data/POS",
-        "cam_neg_tag": "reviewCamNLP/data-tagged/NEG",
-        "cam_pos_tag": "reviewCamNLP/data-tagged/POS",
-        "cam_data": "reviewCamNLP/alldata.csv",
+        "cam_neg": "01-reviewCamNLP/data/NEG",
+        "cam_pos": "01-reviewCamNLP/data/POS",
+        "cam_neg_tag": "01-reviewCamNLP/data-tagged/NEG",
+        "cam_pos_tag": "01-reviewCamNLP/data-tagged/POS",
+        "cam_data": "01-reviewCamNLP/alldata.csv",
         "cam_data_label": ["review", "sentiment"],
-        "IMDB": "aclImdb/alldata-id.txt",
-        "imdb_data": "aclImdb/alldata.csv",
+        "IMDB": "02-aclImdb/alldata-id.txt",
+        "imdb_data": "02-aclImdb/alldata.csv",
         "imdb_data_label": ["review", "sentiment"],
-        "twitter": "twitterSentiment/twitter_sentiment.csv",
+        "twitter": "03-twitterSentiment/twitter_sentiment.csv",
         "twitter_label": ["text", "sentiment"],
-        "douban": "doubanSentiment/douban_sentiment.csv",
+        "douban": "04-doubanSentiment/douban_sentiment.csv",
         "douban_label": ["Comment", "Star"]
     },
     "PoS": 0,
@@ -20,6 +20,9 @@
         "unigram_cutoff": 8,
         "bigram_cutoff": 13,
         "save_path": "models/embeddings_bow"
+    },
+    "pretrain": {
+        "filepath": "Tencent_AILab_ChineseEmbedding/Tencent_AILab_ChineseEmbedding.txt"
     },
     "word2vec": {
         "hparams_set": {
